@@ -1,19 +1,33 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-Vue.use(Vuex)
+// Modules
+import professor from './modulos/professor.js';
+import loading from './modulos/loading.js';
+import comum from './modulos/comum.js';
+import core from './modulos/core.js';
 
-export default new Vuex.Store({
-  state: {
-  },
-  mutations: {
-    showMessage(state, payload) {
-      state.notificationContent = payload.content
-      state.noticicationError = payload.error
-    }
-  },
-  actions: {
-  },
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
+  namespaced: true,
   modules: {
-  }
-})
+    loading,
+    professor,
+    comum,
+    core,
+  },
+});
+
+// // handle state loading
+// store.subscribeAction({
+//   before: (action) => {
+//     store.commit('loading/set', { type: action.type, status: true });
+//   },
+//   after: (action) => {
+//     store.commit('loading/set', { type: action.type, status: false });
+//   },
+// });
+
+export default store;

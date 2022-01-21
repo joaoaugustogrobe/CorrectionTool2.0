@@ -1,0 +1,25 @@
+const Resolucao = require("../../models/Resolucao");
+
+
+async function criar({userId, resolucaoId}){
+    if(!userId, !resolucaoId) return false;
+
+    const resolucao = await Resolucao.findById(resolucaoId).populate("materia", "professor");
+    if(!resolucao) return false
+
+    if(userId == resolucao.materia.professor) return true;
+    return false;
+}
+
+//adicionar aluno
+async function obter({userId, resolucaoId}){
+    if(!userId, !resolucaoId) return false;
+
+    const resolucao = await Resolucao.findById(resolucaoId).populate("materia", "professor");
+    if(!resolucao) return false
+
+    if(userId == resolucao.materia.professor) return true;
+    return false;
+}
+
+module.exports = {criar, obter}

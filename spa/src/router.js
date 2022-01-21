@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Materias from './components/paginas/professor/Materias'
 import Exercicios from './components/paginas/professor/Exercicios'
 import Exercicio from './components/paginas/professor/Exercicio'
+import Correcao from './components/paginas/professor/Correcao'
 import Login from './components/paginas/Login'
 import AlunoMaterias from './components/paginas/aluno/Materias'
 import AlunoMatricula from './components/paginas/aluno/Matricula'
@@ -29,6 +30,12 @@ let router = new Router({
       path: '/exercicio/:id',
       name: 'exercicio',
       component: Exercicio,
+      meta: { requiresAuth: true, role: "professor" }
+    },
+    {
+      path: '/correcao/:id',
+      name: 'Correção',
+      component: Correcao,
       meta: { requiresAuth: true, role: "professor" }
     },
     {

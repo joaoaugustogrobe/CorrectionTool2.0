@@ -16,6 +16,16 @@ const exercicioSchema = new mongoose.Schema({
     trim: true,
     required: true
   },
+  nomeFuncao: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(v);
+      },
+      message: props => `${props.value} nomeFuncao inválido.`
+    },
+  },
   descricao: {
     type: String,
     trim: true,

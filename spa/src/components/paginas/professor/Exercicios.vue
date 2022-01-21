@@ -89,6 +89,8 @@ export default {
       this.exercicios = res.data.data.exercicios
       this.carregando = false
     })
+
+    this.$store.dispatch('professor/obterExercicios');
   }
 };
 </script>

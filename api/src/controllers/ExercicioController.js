@@ -4,7 +4,7 @@ const Matricula = require("../models/Matricula");
 
 module.exports = {
   async store(req, res) {
-    const { materiaId, titulo, descricao, prazo, nota, userId } = req.body;
+    const { materiaId, titulo, descricao, prazo, nota } = req.body;
 
     let materia, exercicio;
 
@@ -14,7 +14,7 @@ module.exports = {
 
       materia = await Materia.findById(materiaId);
       if (!materia) throw "Matéria inexistente.";
-      if (materia.professor != userId)
+      if (materia.professor != req.body.userId)
         throw "Esta matéria não pertence a esse usuário.";
 
       exercicio = await Exercicio.create({

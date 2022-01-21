@@ -108,27 +108,14 @@
             </v-stepper-items>
           </v-stepper>
         </v-flex>
-        <template v-if="!carregando">
-          <v-card class="my-6">
-            <v-flex>
-              <span class="title">Submissoes:</span>
-            </v-flex>
-            <v-flex v-for="(sub, j) in submissoes" :key="j" my-3 mx-5>
-              <card-submissao
-                :alunoNome="sub.aluno.nome"
-                :nota="sub.nota"
-                :tentativas="sub.tentativas"
-                :arquivoLink="`${backendConfig.uri}/resolucao/${sub._id}/download`"
-                :loading="carregando"
-                :status="sub.status"
-                :dataSubmissao="sub.dataSubmissao"
-                :resolucaoFilename="sub.resolucaoFilename"
-              />
-            </v-flex>
-          </v-card>
-        </template>
+        <div v-if="!carregando" class="mt-4">
+          <ListagemSubmissoes :submissoes="submissoes"/>
+        </div>
       </v-card>
     </v-container>
+    <v-btn class="amber accent-3" fixed bottom right fab @click="onEdit">
+      <v-icon>edit</v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -138,10 +125,21 @@ import CardExercicio from "../../template/CardExercicio";
 import CardSubmissao from "../../template/CardSubmissao";
 import backend from "../../../backend";
 import axios from "axios";
+import {mapGetters} from 'vuex';
+
+import ListagemSubmissoes from '../../submissao/ListagemSubmissoes.vue';
+
 axios.defaults.withCredentials = true;
 
 export default {
+  name: 'Exercicio',
   mixins: [dataMixin],
+  computed: {
+    ...mapGetters('professor', ['obterMateria']),
+    materia(){
+      return this.obterMateria(this.exercicio?.materia?._id);
+    },
+  },
   data() {
     return {
       stepperAtivo: 1,
@@ -173,9 +171,13 @@ export default {
   },
   components: {
     "card-exercicio": CardExercicio,
-    "card-submissao": CardSubmissao
+    "card-submissao": CardSubmissao,
+    ListagemSubmissoes,
   },
   methods: {
+    onEdit(){
+      this.$modal.show("alterar-exercicio");
+    },
     log(a) {
       /* eslint-disable no-console */
       console.log(a);
@@ -207,6 +209,7 @@ export default {
       axios.get(`${backend.uri}/${this.$route.params.id}/show`).then(res => {
         this.exercicio = res.data.data.exercicio;
       }),
+      this.$store.dispatch('professor/obterMateria', {materiaId: this.exercicio.materia._id}),
       axios
         .get(`${backend.uri}/resolucoes/${this.$route.params.id}`)
         .then(res => {
@@ -221,6 +224,7 @@ export default {
 
     Promise.all(promisses).then(() => {
       this.carregando = false;
+      this.$store.dispatch('professor/obterMateria', {materiaId: this.exercicio.materia._id});
     });
   }
 };

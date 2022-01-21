@@ -130,13 +130,13 @@ export default {
 
       Promise.all(exerciciosRequisicoes)
         .then(() => {
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
             content: "Exercicios adicionados com sucesso!",
             error: false
           });
         })
         .catch(() => {
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
             content: "Erro ao adicionar um ou mais exercícios.",
             error: true
           });

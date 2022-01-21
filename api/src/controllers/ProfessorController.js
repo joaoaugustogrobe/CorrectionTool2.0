@@ -3,7 +3,6 @@ const SessionController = require('./SessionController')
 
 module.exports = {
   async authenticate(req, res) {
-    console.log(req)
     const { email, password } = req.body;
 
     if (!email || !password)
@@ -22,7 +21,8 @@ module.exports = {
 
 
     let token = SessionController.generateToken({ id: professor._id, role: "professor" })
-    return res.status(200).send({ status: "success", message: "Professor encontrado!!!", data: { user: {nome: professor.nome, role: "professor", gravatarUrl: professor.gravatarUrl}, token: token } })
+    res.cookie("x-access-token", token);
+    return res.status(200).send({ status: "success", message: "Professor encontrado!!!", data: { user: {nome: professor.nome, role: "professor", gravatarUrl: professor.gravatarUrl, id: professor._id}, token: token } })
 
   },
 };

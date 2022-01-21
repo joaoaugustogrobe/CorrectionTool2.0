@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken')
+const Guard = require('../Authorization/Guard')
+
 require('dotenv').config()
 module.exports = {
     validar(req, res, next, type) {
@@ -9,6 +11,11 @@ module.exports = {
                 return res.status(403).send({ status: "error", message: `Rota exclusiva para ${type}`, data: null })
             req.body.userId = decoded.id
             req.body.role = decoded.role
+            req.body.user = {
+                ...decoded,
+                can: (modulo, payload) => Guard.can(modulo, {userId: decoded.id, ...payload}),
+                cannot: (modulo, payload) => Guard.cannot(modulo, {userId: decoded.id, ...payload}),
+            }
             next()
         })
     },

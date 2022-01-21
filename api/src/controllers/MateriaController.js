@@ -120,13 +120,19 @@ module.exports = {
   },
   async show(req, res) {
     const materiaId = req.params.materiaId;
-    let materia = null
+    let materia = null;
+    let matriculas = null;
     if(!materiaId)
       throw "Id da matéria não informado"
     try{
       materia = await Materia.findById(materiaId, "nome professor capacidade lotacao").populate("professor", "nome")
       if(!materia)
-        throw "Matéria inexistente"
+        throw "Matéria inexistente";
+
+      matriculas = await Matricula.find({ materia: materiaId }).populate(
+        "aluno", "id email nome gravatarUrl"
+      );
+  
     }
     catch(e){
       return res.status(400).send({ status: "error", message: e, data: null });
@@ -136,7 +142,14 @@ module.exports = {
       .send({
         status: "success",
         message: "Matéria obtidos com sucesso!!!",
-        data: materia
+        data: {
+          _id: materia._id,
+          lotacao: matriculas.length,
+          capacidade: materia.capacidade,
+          nome: materia.nome,
+          professor: materia.professor,
+          alunos: matriculas.map(matricula => matricula.aluno)
+        },
       });
 
   }

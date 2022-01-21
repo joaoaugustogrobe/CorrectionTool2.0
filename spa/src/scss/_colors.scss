@@ -1,0 +1,82 @@
+$colors: (
+  "white": ( #fff, #fff, #fff, #fff, #fff ),
+  "dark": ( #717D92, #627088, #596780, #4E5D78, #455571, #364766, #283A5B, #14284B, #0A1F44 ),
+  "grey": ( #FAFBFB, #F7F8F9, #F1F2F4, #E1E4E8, #C9CED6, #B0B7C3, #A7AEBB, #98A1B1, #8A94A6 ),
+  "secondary": ( #FAFBFB, #F7F8F9, #F1F2F4, #E1E4E8, #C9CED6, #B0B7C3, #A7AEBB, #98A1B1, #8A94A6 ),
+  "primary": ( #F9F8FC, #F3F1FA, #E9E6F6, #D2CCEC, #BCB3E2, #9C8FD6, #6F5CC3, #553EB5, #382683 ),
+  "purple": ( #F9F8FC, #F3F1FA, #E9E6F6, #D2CCEC, #BCB3E2, #9C8FD6, #6F5CC3, #553EB5, #382683 ),
+  "info": ( #F8FBFF, #EEF7FF, #DCEEFF, #B3DAFF, #83C3FE, #4BA7FE, #0284FE, #026DD6, #01408F ),
+  "danger": ( #FFFBFA, #FEF6F3, #FDE8E1, #FCD7CA, #FABEAA, #F7926F, #F4541D, #D13A06, #A32801 ),
+  "success": ( #FAFDFC, #F5FBF8, #EAF7F1, #D0EDDF, #A9DCC9, #6FCAA8, #36AB80, #23825F, #136A4A ),
+  "warning": ( #FFFDF8, #FEFAF1, #FEF7E6, #FDEECB, #FBE0A1, #FBC050, #F7AF22, #F69D2C, #EF8511 ),
+);
+
+$danger: #dd2727;
+$warning: #ff8f00;
+$info: #0284fe;
+
+// text colors
+
+$text-dark: #0a1f44;
+$text-medium: #4e5d78;
+$text-light: #8a94a6;
+$text-muted: #b0b7c3;
+
+$green-gradient: linear-gradient(-180deg, #68d88e 0%, #00d5be 100%);
+$blue-gradient: linear-gradient(-180deg, #1285ff 0%, #1171d0 100%);
+
+$primary: #0097c0;
+$primary-light: #eef6f8;
+$primary-dark: #0d6686;
+
+$light: #fafbfb;
+$border-color: #e7e7e7;
+$border-color-light: #CCD2DD;
+
+$light-60: #fafbfb60;
+
+$background-dark: #4E5D78;
+
+.color-primary {
+  color:$primary !important;
+}
+
+// light mode
+
+:root {
+
+  // pallete
+  --color-primary: #ff8f00;
+  --color-primary--hover: #{darken($primary, 5%)};
+  --color-primary--focus: #{darken($primary, 10%)};
+  --color-primary--shadow: #{rgba($primary, 0.5)};
+  --color-primary--mine: #{rgba($primary, 0.05)};
+  --color-primary--foreground: #fff; // texts that goes over the primary background
+
+  // backgrounds
+  --bg-light: #fff;
+  --bg-light-dark: #fafafa;
+  --bg-light--mixed: #{mix(#fff, $primary, 85%)};
+  --bg-light--transparent: #{rgba(#fff, .8)};
+
+  --bg-medium: #fafbfb;
+  --bg-medium-dark: #f1f2f4;
+
+  --bg-dark-overlay: #{rgba(#313133, .7)};
+
+  // texts
+  --text-dark: #{$text-dark};
+  --text-medium: #{$text-medium};
+  --text-light: #{$text-light};
+  --text-muted: #{$text-muted};
+
+  // utils
+  --border-color: #e7e7e7;
+  --border-color-light: #e1e4e8;
+  --border-color-medium: #CCD2DD;
+  --modal-overlay: #{rgba($text-dark, 0.3)};
+
+  --loader-color: #E1E4E8;
+  --loader-color--glow: #F1F2F4;
+
+}

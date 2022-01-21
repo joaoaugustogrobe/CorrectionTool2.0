@@ -86,7 +86,7 @@ export default {
             expires: "1Y"
           });
           this.$emit("login-status");
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
             content: "Login efetuado com sucesso!",
             error: false
           });
@@ -95,7 +95,7 @@ export default {
         })
         .catch(e => {
           this.senhaErro = e.response.data.message;
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
             content: "Não foi possivel efetuar o login!",
             error: true
           });

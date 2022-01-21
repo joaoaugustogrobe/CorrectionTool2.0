@@ -107,7 +107,7 @@ export default {
           });
           this.$emit("login-status");
           this.$router.push("aluno");
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
             content: "Bem vindo!",
             error: false
           });
@@ -117,12 +117,12 @@ export default {
           console.dir(e);
           /* eslint-enable no-console */
           if (e.response.status == 401) {
-            this.$store.commit("showMessage", {
+            this.$store.commit("core/showMessage", {
               content: e.response.data.message,
               error: true
             });
           }else{
-            this.$store.commit("showMessage", {
+            this.$store.commit("core/showMessage", {
               content: "Não foi possivel registrar este usuario. Tente novamente mais tarde ou entre em contato conosco.",
               error: true
             });

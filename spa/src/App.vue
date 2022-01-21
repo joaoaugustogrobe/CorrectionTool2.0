@@ -5,6 +5,8 @@
     <v-content class="px4 pb-4 grey lighten-4" >
       <router-view  v-on:login-status="checarAutenticacao"></router-view>
     </v-content>
+    <AlterarExercicio/>
+
     
   </v-app>
 </template>
@@ -13,12 +15,16 @@
 
 import Navbar from './components/template/Navbar'
 import BarraNotificacao from './components/template/BarraNotificacao'
+import AlterarExercicio from './components/modals/AlterarExercicio.vue'
+
+
 
 export default {
   name: 'App',
   components: {
     Navbar,
-    BarraNotificacao
+    BarraNotificacao,
+    AlterarExercicio
   },
 
   data: () => ({
@@ -48,3 +54,8 @@ checarAutenticacao(){
   },
 };
 </script>
+
+<style lang="sass">
+
+  @import '~vuetify/src/styles/main.sass'
+</style>

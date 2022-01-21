@@ -20,6 +20,7 @@ module.exports = {
 
 
     const token = SessionController.generateToken({ id: aluno._id, role: "aluno" })
+    res.cookie("x-access-token", token);
     return res.status(200).send({ status: "success", message: "Aluno encontrado!!!", data: { user: {nome: aluno.nome,role: "aluno", gravatarUrl: aluno.gravatarUrl}, token } })
 
   },
@@ -38,7 +39,8 @@ module.exports = {
       password
     })
 
-    const token = SessionController.generateToken({ id: aluno._id, role: "aluno" })
+    const token = SessionController.generateToken({ id: aluno._id, role: "aluno" });
+    res.cookie("x-access-token", token);
     return res.status(200).send({ status: "success", message: "Aluno cadastrado!!!", data: { user: {nome: aluno.nome, role: "aluno", gravatarUrl: aluno.gravatarUrl}, token } })
   }
 };

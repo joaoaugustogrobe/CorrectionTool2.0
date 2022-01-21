@@ -16,10 +16,10 @@ export default {
     };
   },
   created() {
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === "showMessage") {
-        this.snackbarText = state.notificationContent;
-        this.snackbarError = state.noticicationError;
+    this.$store.subscribe((mutation) => {
+      if (mutation.type === "core/showMessage") {
+        this.snackbarText = mutation.payload.content;
+        this.snackbarError = mutation.payload.error;
         this.snackbar = true;
         setTimeout(() => {
           this.snackbar = false;

@@ -171,11 +171,19 @@ export default {
             }
           })
           .then(res => {
+            this.$store.commit("core/showMessage", {
+              content: "Submissão enviada com sucesso",
+              error: false
+            });
             /* eslint-disable no-console */
             console.log(res);
             /* eslint-enable no-console */
           })
           .catch(e => {
+            this.$store.commit("core/showMessage", {
+              content: "Falha ao enviar submissão. Por favor, tente novamente mais tarde.",
+              error: true,
+            });
             /* eslint-disable no-console */
             console.log(e.response);
             /* eslint-enable no-console */

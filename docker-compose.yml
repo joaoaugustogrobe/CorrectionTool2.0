@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 services:
   spa:
     build:
@@ -29,10 +29,27 @@ services:
       - type: bind
         source: ./api/uploads
         target: /usr/local/Exercicios
-    links:
-      - mongo
+    # links:
+      # - mongo
     working_dir: /var/www
     command: "npm run dev"
+    depends_on:
+      - kafka
+    
+
+  corretor:
+    build:
+      context: "./env/dev/corretor"
+    depends_on:
+      - kafka
+    volumes:
+      - type: bind
+        source: ./corretor
+        target: /var/www
+    # working_dir: /var/www
+    command: "npm run dev"
+
+
 
   mongo:
     #image: mongo
@@ -57,7 +74,46 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      - mongo
 
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "${AIRSEND_ZOOKEEPER_PORT:-2181}:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    volumes:
+      - ./server/kafka:/stats
+#    ports:
+#      - target: 9094
+#        published: 9094
+#        protocol: tcp
+#        mode: host
+    #docker exec -it correctiontool20_kafka_1 kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic lista-correcao
+    #docker exec -it correctiontool20_kafka_1 kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic lista-correcao-resposta
+    environment:
+      BROKER_ID: -1
+      HOSTNAME_COMMAND: ${HOSTNAME_COMMAND:-echo localhost}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ADVERTISED_HOST_NAME: _{HOSTNAME_COMMAND}
+      KAFKA_ZOOKEEPER_CONNECT: ${AIRSEND_ZOOKEEPER_HOST:-zookeeper:2181}
+      KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-10} # for now we just ensure more partitions then consumers as default. That can be fine tunned.
+      KAFKA_DEFAULT_REPLICATION_FACTOR: ${KAFKA_DEFAULT_REPLICATION_FACTOR:-1}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR:-1}
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS:-3000}
+      KAFKA_LOG_RETENTION_BYTES: 536870912
+      KAFKA_LOG_RETENTION_DAYS: 1
+
+
+    restart: on-failure
+    links:
+      - zookeeper
 
 volumes:
   mongodata:

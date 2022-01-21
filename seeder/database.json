@@ -1,0 +1,10 @@
+{
+    "local": {
+        "driver": "mongodb",
+        "database": "test",
+        "host": "localhost",
+        "port": "27017",
+        "user": "root",
+        "password": "example"
+    }
+}

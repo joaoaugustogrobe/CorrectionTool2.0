@@ -4,6 +4,8 @@ const Teste = require("../models/Teste");
 const FileUploadController = require("./FileUploadController");
 const FileController = require("./FileController")
 const DockerController = require("../controllers/DockerController")
+const MQProducer = require('../kafkaproducer');
+
 const fs = require("fs");
 const path = require("path");
 
@@ -24,7 +26,7 @@ module.exports = {
     //Salvar arquivo
       resolucao = await Resolucao.findOne({
         aluno: userId,
-        exercicio: exercicioId
+        exercicio: exercicioId,
       });
 
       let tempPath, definitivoPath;
@@ -45,13 +47,14 @@ module.exports = {
           exercicio: exercicioId,
           aluno: userId,
           resolucaoFilename: originalname,
-          dataSubmissao: Date.now()
+          dataSubmissao: Date.now(),
+          materia: exercicio.materia
         });
         exercicio.submissoesCount++;
         await exercicio.save()
       }
       FileUploadController.rename(tempPath, definitivoPath, originalname);
-      //--
+      console.log("Submetido! gerando execução")
       let correcao = await prepararCorrecao(resolucao)
     } catch (e) {
       if (req.file)
@@ -146,7 +149,7 @@ module.exports = {
 
 async function fetchTestes(exercicioId) {
   try {
-    let testes = await Teste.find({ exercicio: exercicioId }).populate("exercicio", "materia")
+    let testes = await Teste.find({ exercicio: exercicioId }).populate("exercicio", "materia nomeFuncao")
     return testes
   } catch (error) {
     throw error
@@ -157,11 +160,28 @@ async function prepararCorrecao(resolucao) {
   let json = {}
   try {
     let testes = await fetchTestes(resolucao.exercicio)
+    //TODO: VALIDAR TESTES VAZIOS
 
-    json.executar = await JSONFactory(testes, resolucao, "executar")
-    json.comparar = await JSONFactory(testes, resolucao, "comparar")
-    console.log(json)
-    DockerController.executarOperacao(json)
+    testes.forEach(teste => {
+      MQProducer.publishToMQ(JSON.stringify({
+        input: teste.input,
+        materia: teste.exercicio.materia,
+        exercicio: teste.exercicio._id,
+        aluno: resolucao.aluno,
+        resolucao: resolucao._id,
+        teste: teste._id,
+        nomeFuncao: teste.exercicio.nomeFuncao
+      }))
+    })
+    // testes.forEach(teste => {
+
+    //   DockerController.executarOperacao({
+    //     teste,
+    //     aluno: resolucao.aluno,
+    //     materia: teste.exercicio.materia,
+    //     exercicio: teste.exercicio._id
+    //   })
+    // })
 
   } catch (error) {
     console.error(error)

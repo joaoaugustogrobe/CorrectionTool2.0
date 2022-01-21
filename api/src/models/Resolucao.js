@@ -16,6 +16,15 @@ const resolucaoSchema = new mongoose.Schema({
         ref: 'Exercicio',
         required: true
     },
+    materia: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Materia',
+        required: true
+    },
+    corrigido: {
+        type: Boolean,
+        default: false
+    },
     tentativas: {
         type: Number,
         default: 1,

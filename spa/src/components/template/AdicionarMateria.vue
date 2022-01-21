@@ -76,13 +76,13 @@ export default {
           this.dialog = false;
           materia._id = res.data.data._id;
           this.addMateriaCallback(materia);
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
             content: "Matéria adicionada com sucesso!",
             error: false
           });
         })
         .catch(e => {
-          this.$store.commit("showMessage", {
+          this.$store.commit("core/showMessage", {
               content: e.response.data.message || "Erro ao adicionar matéria",
               error: true
             });
