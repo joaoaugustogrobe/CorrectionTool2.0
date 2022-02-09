@@ -48,7 +48,7 @@ export default {
         required: false
     },
     dataFinal: {
-        type: String,
+        type: [String, Number],
         required: false
     },
     status: {

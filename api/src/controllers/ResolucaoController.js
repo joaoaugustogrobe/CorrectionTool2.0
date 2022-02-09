@@ -5,6 +5,8 @@ const FileUploadController = require("./FileUploadController");
 const FileController = require("./FileController")
 const DockerController = require("../controllers/DockerController")
 const MQProducer = require('../kafkaproducer');
+const { ObjectId } = require('mongodb');
+
 
 const fs = require("fs");
 const path = require("path");
@@ -22,8 +24,8 @@ module.exports = {
 
       prazoDiff = Date.now() - exercicio.prazo;
       if (prazoDiff > 0) throw "Submissão atrasada.";
-    //-----
-    //Salvar arquivo
+      //-----
+      //Salvar arquivo
       resolucao = await Resolucao.findOne({
         aluno: userId,
         exercicio: exercicioId,
@@ -40,6 +42,7 @@ module.exports = {
         resolucao.tentativas++;
         resolucao.dataSubmissao = Date.now();
         resolucao.resolucaoFilename = originalname;
+        resolucao.status = 'pendente';
 
         await resolucao.save();
       } else {
@@ -70,7 +73,7 @@ module.exports = {
       data: {
         resolucao: resolucao._id,
         tentativas: resolucao.tentativas,
-        horarioSubmissao: resolucao.dataSubmissao,
+        horarioSubmissao: resolucao.updatedAt,
         entrega: prazoString
       }
     });
@@ -87,10 +90,83 @@ module.exports = {
       if (exercicio.materia.professor != userId)
         throw "Materia não pertence a este professor";
       if (!exercicio) throw "Exercício inexistente.";
-      resolucoes = await Resolucao.find(
-        { exercicio: exercicioId },
-        "aluno resolucaoFilename tentativas dataSubmissao status"
-      ).populate("aluno", "email nome");
+
+      console.log('buscando resolucoes')
+      resolucoes = await Resolucao.aggregate([
+        {
+          '$match': {
+            'exercicio': ObjectId(exercicioId)
+          }
+        }, {
+          '$lookup': {
+            'from': 'comentarios',
+            'localField': '_id',
+            'foreignField': 'resolucao',
+            'as': 'comentarios'
+          }
+        }, {
+          '$set': {
+            'comentarios': {
+              '$size': '$comentarios'
+            }
+          }
+        }, {
+          '$lookup': {
+            'from': 'correcaos',
+            'localField': '_id',
+            'foreignField': 'resolucao',
+            'as': 'nota'
+          }
+        }, {
+          '$unwind': {
+            'path': '$nota',
+            'preserveNullAndEmptyArrays': true
+          }
+        }, {
+          '$set': {
+            'nota': '$nota.notaCorrecao'
+          }
+        }, {
+          '$set': {
+            'nota': {
+              '$ifNull': [
+                '$nota', 0
+              ]
+            }
+          }
+        }, {
+          '$lookup': {
+            'from': 'alunos',
+            'localField': 'aluno',
+            'foreignField': '_id',
+            'as': 'aluno'
+          }
+        }, {
+          '$unwind': {
+            'path': '$aluno'
+          }
+        }, {
+          '$project': {
+            '_id': 1,
+            'tentativas': 1,
+            'dataSubmissao': 1,
+            'status': 1,
+            'exercicio': 1,
+            'aluno._id': 1,
+            'aluno.email': 1,
+            'aluno.nome': 1,
+            'resolucaoFilename': 1,
+            'corrigido': 1,
+            'createdAt': 1,
+            'updatedAt': 1,
+            'comentarios': 1,
+            'nota': 1
+          }
+        }
+      ]);
+      console.log(resolucoes);
+
+
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null });
     }
@@ -170,8 +246,9 @@ async function prepararCorrecao(resolucao) {
         aluno: resolucao.aluno,
         resolucao: resolucao._id,
         teste: teste._id,
-        nomeFuncao: teste.exercicio.nomeFuncao
-      }))
+        nomeFuncao: teste.exercicio.nomeFuncao,
+        versao: resolucao.tentativas,
+      }));
     })
     // testes.forEach(teste => {
 
@@ -219,7 +296,7 @@ async function JSONFactory(testes, resolucao, operacao) {
   }
 
   return _parametroEntrada
-  
+
   //Esta parte estava criando o arquivo JSON. não necessario de acordo com mudanças de projeto
   //let pathJson = await FileController.resolvePathJson(materia, exercicio, aluno, _parametroEntrada)
   //return [pathJson, _parametroEntrada]

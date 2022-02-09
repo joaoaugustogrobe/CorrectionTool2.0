@@ -24,6 +24,11 @@ export default {
     Resolucao,
   },
   mounted() {
+    const {index} = this.$router.history.current.query;
+    if(index){
+      this.submissaoIndex = parseInt(index);
+    }
+
     this.$store.dispatch("professor/obterSubmissoes", {
       exercicioId: this.exercicioId,
     });
@@ -40,7 +45,7 @@ export default {
       else this.submissaoIndex = 0;
     },
     submissaoAnterior() {
-      if (this.anteriorExiste) this.submissaoIndex = 0;
+      if (this.anteriorExiste) this.submissaoIndex--;
       else this.submissaoIndex = this.submissao.length;
     },
   },

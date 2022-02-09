@@ -66,6 +66,6 @@ module.exports = {
     } catch (e) {
         return res.status(401).send({ status: "error", message: e.message, data: null })
     }
-    return res.status(200).send({ status: "success", message: "Teste cadastrado!!!", data: { testes } })
+    return res.status(200).send({ status: "success", message: "Teste obtidos com sucesso!!!", data: { testes } })
   }
 };

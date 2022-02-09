@@ -37,8 +37,13 @@ const resolucaoSchema = new mongoose.Schema({
         type: String,
         required: false,
         default: "pendente"
+    },
+    desempenho: {
+        type: String,
+        required: false,
+        default: "pendente",
     }
-})
+}, { timestamps: true });
 
 
 module.exports = mongoose.model('Resolucao', resolucaoSchema);

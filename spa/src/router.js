@@ -34,7 +34,7 @@ let router = new Router({
     },
     {
       path: '/correcao/:id',
-      name: 'Correção',
+      name: 'correcao',
       component: Correcao,
       meta: { requiresAuth: true, role: "professor" }
     },

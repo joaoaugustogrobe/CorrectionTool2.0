@@ -29,6 +29,10 @@ const resolucaoTesteSchema = new mongoose.Schema({
     isError: {
         type: Boolean,
         default: false,
+    },
+    versao: {
+        type: Number,
+        default: 0,
     }
 }, { timestamps: true })
 

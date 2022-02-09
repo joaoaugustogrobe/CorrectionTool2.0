@@ -15,6 +15,10 @@ const testeSchema = new mongoose.Schema({
         ref: 'Exercicio',
         required: true
     },
+    nome: {
+        type: String,
+        default: '',
+    },
     isPrivate: {
         type: Boolean,
         default: false

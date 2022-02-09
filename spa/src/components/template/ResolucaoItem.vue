@@ -64,63 +64,11 @@
       </v-card>
     </v-dialog>
 
+    <StepperResolucaoItem :submissao="submissao"/>
+
     <div class="avaliacao px-3 mt-4">
-      <div class="d-flex justify-space-between">
-        <span>Desempenho em testes</span>
-        <div>
-          <small class="mr-2">{{ testesNota }}%</small>
-          <v-menu offset-y>
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon v-bind="attrs" v-on="on"> info </v-icon>
-            </template>
-            <v-list max-width="500">
-              <v-list-item
-                v-for="(teste, index) in resolucaoTestes"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>Teste {{ index + 1 }}</v-list-item-title>
-
-                  <v-list-item-subtitle>
-                    &gt; {{ chamadaFuncao(nomeExercicio, teste.input) }}<br />
-                    &lt; {{ teste.testeresolucao.output }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-
-                <v-list-item-action>
-                  <v-list-item-action-text
-                    >{{
-                      teste.testeresolucao.isError
-                        ? random(0, 59)
-                        : random(60, 100)
-                    }}/100</v-list-item-action-text
-                  >
-
-                  <v-icon
-                    :color="
-                      teste.testeresolucao.isError
-                        ? 'red accent-1'
-                        : 'green accent-2'
-                    "
-                    >{{
-                      teste.testeresolucao.isError
-                        ? "mdi-close-circle"
-                        : "mdi-check-circle"
-                    }}</v-icon
-                  >
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </div>
-      </div>
-      <v-slider
-        v-model="testesNota"
-        :thumb-color="testesNotaCor"
-        thumb-label
-        readonly
-      />
-
+      
+      
       <div class="d-flex justify-space-between">
         <span>Resolução do aluno</span>
         <small>{{ resolucaoNota }}%</small>
@@ -142,6 +90,8 @@
 </template>
 
 <script>
+import StepperResolucaoItem from '../comum/StepperResolucaoItem';
+
 import { butify } from "../../util/beautifier";
 export default {
   props: {
@@ -157,6 +107,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  components: {
+    StepperResolucaoItem,
   },
   data() {
     return {
@@ -195,12 +148,6 @@ export default {
     },
     resolucaoNotaCor() {
       return this.resolucaoNota >= 60 ? "blue" : "red";
-    },
-    testesNota() {
-      return 76;
-    },
-    testesNotaCor() {
-      return this.testesNota >= 60 ? "blue" : "red";
     },
   },
   watch: {

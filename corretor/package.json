@@ -9,6 +9,7 @@
     "dev": "nodemon src/index.js"
   },
   "dependencies": {
+    "amqplib": "^0.8.0",
     "axios": "^0.21.4",
     "dockerode": "^3.3.1",
     "kafkajs": "^1.15.0"

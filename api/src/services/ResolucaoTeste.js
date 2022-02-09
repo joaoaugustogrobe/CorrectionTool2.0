@@ -6,7 +6,7 @@ const TesteResolucao = require('../models/TesteResolucao');
 module.exports = {
   //Executado pelo broker após executar um exercicio
   async armazenarOutput(payload) {
-    const { input, materia, exercicio, aluno, resolucao, teste, output } = payload;
+    const { input, materia, exercicio, aluno, resolucao, teste, output, versao } = payload;
     // const _output = parseOutput(payload.output);
 
     try{
@@ -18,28 +18,30 @@ module.exports = {
         output: isError ? output : output.slice(index),
         aluno,
         exercicio,
-        isError
+        isError,
+        versao
       });
       if(!res) throw e;  //TODO handle error
 
-      const exercicioObj = Exercicio.findById(exercicio);
+      const exercicioObj = await Exercicio.findById(exercicio);
       if(!exercicioObj) throw 'Exercício inexistente';
 
-      const resolucaoObj = Resolucao.findById(resolucao);
+      const resolucaoObj = await Resolucao.findById(resolucao);
       if(!resolucaoObj) throw 'Resolução inexistente';
 
-      let resolucaoStatus = '';
-      if(new Date().getTime() >= exercicioObj.prazo){
-        resolucaoStatus = 'atrazado';
-      }else{
-        resolucaoStatus = 'ok'
+      
+      
+      //Verifica se existem outras correções do mesmo exercicio sendo executadas
+      const testesExercicio = await Teste.find({exercicio});
+      const resolucoesExercicio = await TesteResolucao.find({resolucao, versao});
+
+      if(resolucoesExercicio.length === testesExercicio.length){
+        resolucaoObj.status = 'ok';
+        await resolucaoObj.save();
       }
 
-      resolucaoObj.status = resolucaoStatus;
-      await resolucaoObj.save();
 
-
-      console.log("[INFO] - Correção registrada", res, output.indexOf("ans =") !== 0);
+      console.log(`[INFO] - Correção registrada. ${resolucoesExercicio.length}/${testesExercicio.length}`);
 
     }catch(e){
       console.error(e);

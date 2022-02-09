@@ -2,12 +2,14 @@ const Resolucao = require('./Gates/ResolucaoGate');
 const Correcao = require('./Gates/CorrecaoGate');
 const Exercicio = require('./Gates/ExercicioGate');
 const Comentario = require('./Gates/ComentarioGate');
+const Matricula = require('./Gates/MatriculaGate');
 
 const modulos = {
     resolucao: Resolucao,
     exercicio: Exercicio,
     correcao: Correcao,
     comentario: Comentario,
+    matricula: Matricula,
 }
 
 class Guard{

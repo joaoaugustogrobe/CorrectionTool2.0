@@ -41,6 +41,8 @@ module.exports = {
           $addFields: {
             'input': '$teste.input',
             'isPrivate': '$teste.isPrivate',
+            'nome': '$teste.nome',
+            'output': '$teste.output',
           }
         },
         { $project: { teste: 0 } }
@@ -82,16 +84,14 @@ module.exports = {
       const exercicio = await Exercicio.findById(exercicioId);
 
       resolucoes = await Matricula.aggregate(
-
-
         [
           {
             '$match': {
-              'materia': new ObjectId('613f9b04d45c820033ed8ce1')
+              'materia': new ObjectId(exercicio.materia)
             }
           }, {
             '$set': {
-              'exercicio': new ObjectId('613f9c8fd45c820033ed8ce3')
+              'exercicio': new ObjectId(exercicio._id)
             }
           }, {
             '$lookup': {
@@ -161,7 +161,7 @@ module.exports = {
                               }
                             ]
                           }
-                        }
+                        },
                       }, {
                         '$sort': {
                           'updatedAt': 1
@@ -179,8 +179,6 @@ module.exports = {
             }
           }
         ]
-
-
       );
 
       console.log(resolucoes)

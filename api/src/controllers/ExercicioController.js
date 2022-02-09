@@ -91,7 +91,7 @@ module.exports = {
         }}, //Mesmo que o populate(materia)
         {"$unwind": "$materia"}, //Tira matéria do array
         {$match: { "materia.professor": id }}, //Exercicio pertente a matéria do professor
-        {$project: {_id: 1, titulo:1,status: 1, descricao: 1, prazo: 1, nota: 1, submissoesCount:1, "materia.nome": 1}} //Filtra apenas campos relevantes
+        {$project: {_id: 1, titulo:1,status: 1, descricao: 1, prazo: 1, nota: 1, submissoesCount:1, "materia.nome": 1, "materia._id": 1}} //Filtra apenas campos relevantes
       ])
       /*
       exercicios = await Exercicio.aggregate( [ { $group : { 
