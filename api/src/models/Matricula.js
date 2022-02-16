@@ -13,4 +13,5 @@ const matriculaSchema = new mongoose.Schema({
   },
 });
 
+matriculaSchema.plugin(require('mongoose-delete'), {deletedAt: true, overrideMethods: true});
 module.exports = mongoose.model('Matricula', matriculaSchema);

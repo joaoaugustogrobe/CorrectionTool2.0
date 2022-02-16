@@ -50,7 +50,7 @@ module.exports = {
         .populate("professor", "nome");
     else {
       let matriculas = await Matricula.find({aluno: req.body.userId})
-      materias = await Materia.find({}, "nome professor capacidade lotacao").populate("professor", "nome");
+      materias = await Materia.find({}, "nome professor capacidade lotacao senha").populate("professor", "nome");
 
       let matriculaContemMateria = function(materia){
         for(m of matriculas)
@@ -63,17 +63,6 @@ module.exports = {
       materias = materias.slice((pagina-1) * itensPorPagina, pagina * itensPorPagina)
     }
 
-    materias = materias.map(materia => {
-      let m = {
-        _id: materia._id,
-        nome: materia.nome,
-        professor: materia.professor.nome,
-        capacidade: materia.capacidade,
-        lotacao: materia.lotacao,
-        status: true
-      };
-      return m
-    });
 
     return res
       .status(200)
@@ -106,7 +95,8 @@ module.exports = {
     let alunosMatriculados = matriculas.map(matricula => {
       return {
         _id: matricula.aluno._id,
-        nome: matricula.aluno.nome
+        nome: matricula.aluno.nome,
+        email: matricula.aluno.email,
       };
     });
 
@@ -152,5 +142,52 @@ module.exports = {
         },
       });
 
+  },
+
+  async salvar(req, res) {
+    const {user, nome, senha, status, materiaId, capacidade} = req.body;
+
+    let materia = {};
+
+    try{
+      if (await user.cannot("materia/salvar", { materiaId })) throw "Permissão insuficiente";
+
+      materia = await Materia.findById(materiaId);
+      console.log('materia', materia);
+
+      if(nome){
+        console.log('nome');
+        materia.nome = nome;
+      }
+
+      if(capacidade){
+        console.log('capacidade')
+        if(capacidade > 0 && capacidade <= 50) materia.capacidade = capacidade;
+        else throw "Capacidade inválida";
+      }
+
+      if(senha){
+        console.log('senha')
+        if(senha.length >= 6) materia.senha = senha;
+        else throw "Senha inválida";
+      }
+
+      if(status !== undefined){
+        console.log('status')
+        if(typeof(status) == 'boolean') materia.status = status;
+        else throw "Status inválido";
+      }
+
+      await materia.save();
+
+    }
+    catch(e){
+      return res.status(400).send({ status: "error", message: e, data: null });
+    }
+    return res.status(200).send({
+      status: "success",
+      message: "Matéria salva",
+      data: {materia}
+    });
   }
 };

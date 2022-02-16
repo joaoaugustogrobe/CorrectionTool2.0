@@ -20,14 +20,14 @@ const store = new Vuex.Store({
   },
 });
 
-// // handle state loading
-// store.subscribeAction({
-//   before: (action) => {
-//     store.commit('loading/set', { type: action.type, status: true });
-//   },
-//   after: (action) => {
-//     store.commit('loading/set', { type: action.type, status: false });
-//   },
-// });
+// handle state loading
+store.subscribeAction({
+  before: (action) => {
+    store.commit('loading/set', { type: action.type, status: true });
+  },
+  after: (action) => {
+    store.commit('loading/set', { type: action.type, status: false });
+  },
+});
 
 export default store;

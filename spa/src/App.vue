@@ -10,6 +10,7 @@
       <router-view v-on:login-status="checarAutenticacao"></router-view>
     </v-content>
     <AlterarExercicio />
+    <AlterarMateria />
   </v-app>
 </template>
 
@@ -17,6 +18,7 @@
 import Navbar from "./components/template/Navbar";
 import BarraNotificacao from "./components/template/BarraNotificacao";
 import AlterarExercicio from "./components/modals/AlterarExercicio.vue";
+import AlterarMateria from "./components/modals/AlterarMateria.vue";
 
 export default {
   name: "App",
@@ -24,6 +26,7 @@ export default {
     Navbar,
     BarraNotificacao,
     AlterarExercicio,
+    AlterarMateria,
   },
 
   data: () => ({

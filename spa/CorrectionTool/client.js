@@ -54,10 +54,9 @@ class CorrectionTool {
         const response = await axios.post(`${this.fullUrl}/${endpoint}`, data, { ...config, params: params });
 
         if(response.data && response.data.meta && !response.data.meta.ok) {
-
           return {
             meta: response.data.meta,
-            ok: false,
+            ok: String(response.status).charAt(0) == '2',
             unauthorized: (response.status === 401),
             error: (response.data.meta.error) ? response.data.meta.error : false
           }
@@ -70,7 +69,7 @@ class CorrectionTool {
 
         return {
           ...response.data.meta,
-          ok: true,
+          ok: String(response.status).charAt(0) == '2',
           message: (response.data && response.data.meta) ? response.data.meta.message : null,
           data: response.data
         }

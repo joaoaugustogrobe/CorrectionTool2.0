@@ -2,15 +2,15 @@ const mongoose = require('mongoose');
 
 const materiaSchema = new mongoose.Schema({
   nome: {
-  type: String,
-  trim: true,
-  required: true
- },
+    type: String,
+    trim: true,
+    required: true
+  },
   password: {
-  type: String,
-  trim: true,
-  required: true
- },
+    type: String,
+    trim: true,
+    required: true
+  },
   professor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Professor',
@@ -25,6 +25,10 @@ const materiaSchema = new mongoose.Schema({
     type: Number,
     required: false,
     default: 25
+  },
+  status: {
+    type: Boolean,
+    default: true,
   }
 });
 

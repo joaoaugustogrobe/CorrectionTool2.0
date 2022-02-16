@@ -163,5 +163,21 @@ module.exports = {
     }
 
     return res.status(200).send({ status: "success", message: "Matriculas obtidas com sucesso!!!", ...matriculas  })
+  },
+  
+  async cancelarMatricula(req, res){
+    const { user, materiaId, alunoId } = req.body;
+
+    try{
+      if (await user.cannot("matricula/deletar", { userId: user.id, materiaId, alunoId })) throw "Permissão insuficiente";
+
+      // await matricula.delete();
+      await Matricula.delete({ materia: materiaId, aluno: alunoId });
+      
+    }catch(e){
+      return res.status(400).send({ status: "error", message: e, data: null })
+    }
+    return res.status(200).send({ status: "success", message: "Matricula deletada com sucesso!!!" })
+
   }
 };

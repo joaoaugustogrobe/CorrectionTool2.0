@@ -31,9 +31,13 @@ routes.post('/materia/create', (req, res, next) => SessionController.validar(req
 routes.get('/:materiaId/alunos', (req, res, next) => SessionController.validar(req, res, next, "professor"), MateriaController.obterAlunosMatriculados);
 routes.get('/materia/:materiaId/show', (req, res, next) => SessionController.validar(req, res, next), MateriaController.show);
 routes.get('/materia', (req, res, next) => SessionController.validar(req, res, next), MateriaController.index);
+routes.post('/materia/salvar', (req, res, next) => SessionController.validar(req, res, next, "professor"), MateriaController.salvar);
 
+//Matricula
 routes.get('/matricula', (req, res, next) => SessionController.validar(req, res, next, "aluno"), MatriculaController.obterMatriculasAluno);
 routes.post('/matricula/create', (req, res, next) => SessionController.validar(req, res, next, "aluno"), MatriculaController.store);
+routes.post('/matricula/deletar', (req, res, next) => SessionController.validar(req, res, next), MatriculaController.cancelarMatricula)
+
 
 routes.post('/exercicio/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.store);
 routes.get('/exercicios/', (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.getExerciciosProfessor);

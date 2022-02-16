@@ -196,6 +196,15 @@ export default {
         border-top: 1px solid var(--border-color);
         overflow-y: auto;
         padding: 20px;
+
+        .section{
+          .section-title{
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 17px;
+            margin-bottom: 18px;
+          }
+        }
       }
       .modal-toaster {
         padding: 0;

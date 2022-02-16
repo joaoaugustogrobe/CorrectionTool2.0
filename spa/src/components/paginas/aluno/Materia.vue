@@ -3,6 +3,7 @@
     <v-card :loading="carregando">
       <v-card-text>
         <span class="title black--text">{{materia.nome}}</span>
+        <v-btn v-tooltip="'test'">Sair</v-btn>
         <v-expansion-panels class="mt-3">
           <v-expansion-panel
             @change="onExpansionChange(exercicio)"

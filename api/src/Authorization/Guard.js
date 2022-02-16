@@ -2,6 +2,7 @@ const Resolucao = require('./Gates/ResolucaoGate');
 const Correcao = require('./Gates/CorrecaoGate');
 const Exercicio = require('./Gates/ExercicioGate');
 const Comentario = require('./Gates/ComentarioGate');
+const Materia = require('./Gates/MateriaGate');
 const Matricula = require('./Gates/MatriculaGate');
 
 const modulos = {
@@ -9,19 +10,24 @@ const modulos = {
     exercicio: Exercicio,
     correcao: Correcao,
     comentario: Comentario,
+    materia: Materia,
     matricula: Matricula,
 }
 
 class Guard{
-    static can(permissao, payload){
+    static async can(permissao, payload){
         const [modulo, tipo] = permissao.toLowerCase().split('/');
+        
+        const can = await modulos[modulo][tipo](payload);
 
         // !! - previne dataleak do Guard, força retornar apenas true/false
-        return !!modulos[modulo][tipo](payload) == true;
+        return !!can == true;
     }
 
-    static cannot(permissao, payload){
-        return !this.can(permissao, payload);
+
+    static async cannot(permissao, payload){
+        const can = await this.can(permissao, payload);;
+        return !can;
     }
 }
 

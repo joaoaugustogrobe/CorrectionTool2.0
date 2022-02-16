@@ -9,7 +9,8 @@ async function deletar({ userId, materiaId, alunoId }) {
     const materia = await Materia.findById(materiaId);
     if (!materia) return false;
 
-    const matricula = await Matricula.find({ materia: materiaId, aluno: alunoId });
+    const matricula = await Matricula.findOne({ materia: materiaId, aluno: alunoId });
+    console.log("gate:", matricula);
     if (!matricula) return false;
 
 
@@ -21,5 +22,6 @@ async function deletar({ userId, materiaId, alunoId }) {
 
     return false;
 }
+
 
 module.exports = { deletar }
