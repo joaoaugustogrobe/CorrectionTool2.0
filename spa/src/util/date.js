@@ -1,3 +1,8 @@
+const dayjs = require("dayjs");
+dayjs.locale("pt-br");
+const relativeTime = require("dayjs/plugin/relativeTime");
+dayjs.extend(relativeTime);
+
 export const dateMixin = {
     methods: {
         converterData(data){
@@ -9,6 +14,10 @@ export const dateMixin = {
             }catch(e){
                 return ''
             }
+        },
+
+        dataRelativa(data){
+            return dayjs(dayjs(new Date(parseInt(data)))).fromNow()
         }
     }
 }

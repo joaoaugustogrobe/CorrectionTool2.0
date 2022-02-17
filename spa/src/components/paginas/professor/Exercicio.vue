@@ -1,7 +1,6 @@
 <template>
   <div class="exercicio">
     <v-container class="my-5">
-      <v-card :loading="carregando" :class="`px-2 my-3`">
         <v-flex>
           <card-exercicio
             flat
@@ -136,7 +135,6 @@
         <div v-if="!carregando" class="mt-4">
           <ListagemSubmissoes :submissoes="submissoes" />
         </div>
-      </v-card>
     </v-container>
     <v-btn class="amber accent-3" fixed bottom right fab @click="onEdit">
       <v-icon>edit</v-icon>
@@ -202,7 +200,7 @@ export default {
   },
   methods: {
     onEdit() {
-      this.$modal.show("alterar-exercicio");
+      this.$modal.show("alterar-exercicio", {exercicio: this.exercicio});
     },
     log(a) {
       /* eslint-disable no-console */

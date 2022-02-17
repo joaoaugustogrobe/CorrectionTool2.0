@@ -2,6 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const uploadConfig = require('./config/upload');
+const { checkSchema, validationResult } = require('express-validator');
+const { validate } = require('./Validation/index.js');
+const schemas = require('./Validation/schemas');
+
 
 
 const AlunoController = require('./controllers/AlunoController');
@@ -43,10 +47,9 @@ routes.post('/exercicio/create', (req, res, next) => SessionController.validar(r
 routes.get('/exercicios/', (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.getExerciciosProfessor);
 routes.get('/exercicio/show/all', (req, res, next) => SessionController.validar(req, res, next, "aluno"), ExercicioController.getExerciciosAluno);
 routes.get('/exercicio/show/:materiaId', (req, res, next) => SessionController.validar(req, res, next), ExercicioController.getExerciciosMateria);
-routes.get('/:exercicioId/show/', (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.exercicioShow);
+routes.get('/:exercicioId/show/', validate, (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.exercicioShow);
 routes.get('/exercicio/notas/:exercicioId', (req, res, next) => SessionController.validar(req, res, next, "professor"), ResolucaoTesteController.ObterNotasExercicio);
-
-
+routes.post('/exercicio/salvar', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/exercicio/salvar']), ExercicioController.salvar);
 
 routes.post('/resolucao/submit', upload.single('arquivoResolucao'), (req, res, next) => SessionController.validar(req, res, next, "aluno"), ResolucaoController.store);
 routes.get('/resolucoes/:exercicioId', (req, res, next) => SessionController.validar(req, res, next, "professor"), ResolucaoController.obterResolucoesDeExercicio);

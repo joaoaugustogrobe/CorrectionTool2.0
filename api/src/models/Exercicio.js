@@ -51,7 +51,11 @@ const exercicioSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
-  }
+  },
+  visivel: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model('Exercicio', exercicioSchema);

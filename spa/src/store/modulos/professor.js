@@ -44,6 +44,12 @@ export default {
       const { alunos, materiaId } = payload;
 
       Vue.set(state.alunos, materiaId, alunos);
+    },
+    guardarExercicio: (state, {exercicioId, exercicio}) => {
+      const exercicioIndex = _.findIndex(state.exercicios, {_id: exercicioId});
+      if(exercicioId === -1) return;
+
+      Vue.set(state.exercicios, exercicioIndex, exercicio);
     }
   },
   actions: {
@@ -188,6 +194,26 @@ export default {
       }
 
       context.dispatch('obterAlunosMateria', materia._id);
+    },
+    async salvarExercicio(context, { titulo, descricao, _id, prazo, visivel }) {
+      const req = await context.state.client.post('exercicio/salvar', { titulo, descricao, exercicioId: _id, prazo, visivel });
+      
+      if (req.ok) {
+        context.commit('guardarExercicio', {
+          exercicioId: _id,
+          exercicio: req.data.data.exercicio,
+        });
+        context.commit("core/showMessage", {
+          content: "Exercício salvo com sucesso!",
+          error: false,
+        }, { root: true });
+      } else {
+        context.commit("core/showMessage", {
+          content: "Falha ao salvar matéria!",
+          error: true
+        }, { root: true });
+      }
+
     },
     async salvarMateria(context, { nome, senha, status, capacidade, materiaId }) {
       const payload = {
