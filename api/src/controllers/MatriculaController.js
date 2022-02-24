@@ -16,6 +16,8 @@ module.exports = {
         throw "Matéria inexistente"
       if (password != materia.password)
         throw "Senha incorreta"
+      if (materia.capacidade >= materia.lotacao)
+        throw "Matéria cheia";
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null })
     }
@@ -174,6 +176,9 @@ module.exports = {
       // await matricula.delete();
       await Matricula.delete({ materia: materiaId, aluno: alunoId });
       
+      let materia = await Materia.findById(materiaId);
+      materia.lotacao--;
+      await materia.save();
     }catch(e){
       return res.status(400).send({ status: "error", message: e, data: null })
     }
