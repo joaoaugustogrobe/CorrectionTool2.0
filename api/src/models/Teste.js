@@ -22,6 +22,10 @@ const testeSchema = new mongoose.Schema({
     isPrivate: {
         type: Boolean,
         default: false
+    },
+    mensagemErro: {
+        type: String,
+        default: '',
     }
 })
 

@@ -40,6 +40,14 @@ export default {
 
       Vue.set(state.testes, exercicioId, testes);
     },
+    salvarTesteExercicio: (state, payload) => {
+      const {teste, exercicioId} = payload;
+      console.log("salvarTesteExercicio", payload);
+      const testeIndex = _.findIndex(state.testes[exercicioId], {_id: teste._id});
+      console.log(testeIndex);
+      if(testeIndex >= 0)
+        Vue.set(state.testes[exercicioId], testeIndex, teste);
+    },
     guardarAlunos: (state, payload) => {
       const { alunos, materiaId } = payload;
 
@@ -261,8 +269,29 @@ export default {
           error: true
         }, { root: true });
       }
-
     },
+
+    async salvarTeste(context, payload) {
+      const req = await context.state.client.post('testes/salvar', {...payload, testeId: payload._id});
+
+      if (req.ok) {
+        console.log(req.data.data.teste);
+        context.commit('salvarTesteExercicio', {
+          exercicioId: req.data.data.teste.exercicio,
+          teste: req.data.data.teste
+        });
+        context.commit("core/showMessage", {
+          content: "Teste salvo com sucesso!",
+          error: false,
+        }, { root: true });
+      } else {
+        context.commit("core/showMessage", {
+          content: "Falha ao salvar teste!",
+          error: true
+        }, { root: true });
+      }      
+
+    }
   },
   getters: {
     obterSubmissoesExercicio: state => exercicioId => {

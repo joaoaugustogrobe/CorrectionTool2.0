@@ -1,6 +1,7 @@
 const { body } = require('express-validator');
 
 const Exercicio = require('../models/Exercicio');
+const Teste = require('../models/Teste');
 
 let schemas = {};
 
@@ -87,6 +88,58 @@ schemas['GET/:exercicioId/show/'] = {
 		},
 	},
 }
+
+schemas['POST/testes/salvar'] = {
+	testeId: {
+		custom: {
+			options: async (value, { req, location, path }) => {
+				return Teste.findById(value).then(teste => {
+					if (!teste) {
+						return Promise.reject('Teste não existe');
+					}
+				});
+			},
+		},
+	},
+	isPrivate: {
+		isBoolean: {
+			errorMessage: 'Visivel deve ser verdadeiro ou falso',
+		},
+		toBoolean: true,
+	},
+	nome: {
+		isLength: {
+			errorMessage: 'Título deve conter ao menos 6 caracteres',
+			options: { min: 6 },
+		},
+	},
+	mensagemErro: {
+		custom: {
+			options: (value, { req, location, path }) => {
+				if (typeof(value) !== 'string') throw new Error('Mensagem de erro inválida');
+				return true;
+			},
+		},
+	},
+	output: {
+		isLength: {
+			errorMessage: 'Output é obrigatório',
+			options: { min: 0 },
+		},
+	},
+	input: {
+		custom: {
+			options: (value, { req, location, path }) => {
+				if (typeof (value) !== 'object' || !value.length) throw new Error('Input inválido');
+				if (value.some(input => {
+					return typeof (input) !== 'string' || !input.length
+				})) throw new Error('Input inválido');
+				return true;
+			},
+		},
+	}
+
+};
 
 module.exports = schemas;
 

@@ -59,6 +59,7 @@ routes.get('/resolucao/:resolucaoId/download', (req, res, next) => SessionContro
 //Testes
 routes.post('/testes/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), TesteController.store);
 routes.get('/exercicio/:exercicioId/testes', (req, res, next) => SessionController.validar(req, res, next), TesteController.getTestesExercicio);
+routes.post('/testes/salvar', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/testes/salvar']), TesteController.salvar);
 
 //ResolucaoTeste
 routes.get('/resolucao/testes/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), ResolucaoTesteController.obterNotasResolucao);

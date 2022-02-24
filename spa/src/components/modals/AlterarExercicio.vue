@@ -52,7 +52,11 @@
     </template>
     <template class="body" v-slot:body>
       <Notas v-if="page === 'notas'" />
-      <Configuracoes v-else-if="page === 'configuracoes'" :exercicio="exercicio"/>
+      <Configuracoes
+        v-else-if="page === 'configuracoes'"
+        :exercicio="exercicio"
+      />
+      <Testes v-else-if="page === 'testes'" :exercicio="exercicio" />
 
       <h1 v-else>Teste</h1>
     </template>
@@ -63,6 +67,7 @@
 import Modal from "./Modal.vue";
 import Notas from "../Exercicio/Configuracoes/Notas.vue";
 import Configuracoes from "./Exercicio/Configuracoes.vue";
+import Testes from "./Exercicio/Testes.vue";
 
 import { mapGetters } from "vuex";
 
@@ -77,6 +82,7 @@ export default {
   components: {
     Modal,
     Notas,
+    Testes,
     Configuracoes,
   },
   computed: {
@@ -91,7 +97,6 @@ export default {
   methods: {
     onOpen({ params }) {
       if (params) {
-        console.log(params)
         this.exercicioId = params.exercicio._id;
       }
     },

@@ -4,6 +4,7 @@ const Exercicio = require('./Gates/ExercicioGate');
 const Comentario = require('./Gates/ComentarioGate');
 const Materia = require('./Gates/MateriaGate');
 const Matricula = require('./Gates/MatriculaGate');
+const Teste = require('./Gates/TesteGate');
 
 const modulos = {
     resolucao: Resolucao,
@@ -12,6 +13,7 @@ const modulos = {
     comentario: Comentario,
     materia: Materia,
     matricula: Matricula,
+    teste: Teste,
 }
 
 class Guard{

@@ -2,6 +2,8 @@ const Exercicio = require('../models/Exercicio');
 const Teste = require('../models/Teste');
 const Matricula = require('../models/Matricula')
 
+const {mapErrors} = require('../Validation/index');
+
 module.exports = {
   async store(req, res) {
     const { input, output, exercicioId, userId, isPrivate } = req.body;
@@ -67,5 +69,30 @@ module.exports = {
         return res.status(401).send({ status: "error", message: e.message, data: null })
     }
     return res.status(200).send({ status: "success", message: "Teste obtidos com sucesso!!!", data: { testes } })
+  },
+
+  async salvar(req, res) {
+      const {user, testeId, input, output, isPrivate, nome, mensagemErro } = req.body;
+      let teste;
+
+      try{
+        mapErrors(req).throw();
+        if (await user.cannot("teste/salvar", { testeId })) throw "Permissão insuficiente";
+
+        teste = await Teste.findById(testeId);
+        teste.input = input;
+        teste.output = output;
+        teste.isPrivate = isPrivate;
+        teste.nome = nome;
+        teste.mensagemErro = mensagemErro;
+
+        await teste.save();
+      }
+      catch (e) {
+        console.log(e);
+        return res.status(401).send({ status: "error", message: e && typeof (e) === 'object' && e.array ? e.mapped() : e, data: null });
+      }
+      return res.status(200).send({ status: "success", message: "Exercício salvo!!!", data: { teste } })
+  
   }
 };

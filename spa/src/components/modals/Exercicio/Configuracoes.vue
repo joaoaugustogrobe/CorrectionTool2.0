@@ -87,26 +87,45 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     :value="dataEntregaDisplay"
-										class="mt-2"
+                    class="mt-2"
                     prepend-icon="mdi-calendar"
-										outlined
-										dense
+                    outlined
+                    dense
                     readonly
                     v-bind="attrs"
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <v-date-picker :value="dataEntregaISO" @input="atualizarDataISO" no-title scrollable>
+                <v-date-picker
+                  :value="dataEntregaISO"
+                  @input="atualizarDataISO"
+                  no-title
+                  scrollable
+                >
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="menu = false">
                     Cancel
                   </v-btn>
-                  <v-btn text color="primary" @click="$refs.menu.save(form.prazo)">
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.menu.save(form.prazo)"
+                  >
                     OK
                   </v-btn>
                 </v-date-picker>
               </v-menu>
             </ConfiguracaoItem>
+          </v-col>
+          <v-col cols="12">
+            <ConfiguracaoItem
+              :value="form.nomeFuncao"
+              label="Nome da função"
+              :descricao="`O Nome da função é usado no template do exercicio, disponivel para downloads para alunos, alterar o campo. Este campo não pode ser alterado.`"
+              :loading="loading"
+              textfield
+              disabled
+            />
           </v-col>
           <v-col cols="12">
             <ConfiguracaoItem
@@ -120,21 +139,22 @@
         </v-row>
       </v-container>
     </v-form>
-    <v-btn
-      v-if="exercicioAlterado && !loading"
-      class="float-right mt-2 mx-2"
-      color="primary"
-      @click="onSalvar"
-      >Salvar</v-btn
-    >
-    <v-btn
-      v-if="exercicioAlterado && !loading"
-      class="float-right mt-2"
-      color="warning"
-      outlined
-      @click="onCancelar"
-      >Cancelar</v-btn
-    >
+    <div class="py-3 float-right">
+      <v-btn
+        v-if="exercicioAlterado && !loading"
+        class="mx-2"
+        color="primary"
+        @click="onSalvar"
+        >Salvar</v-btn
+      >
+      <v-btn
+        v-if="exercicioAlterado && !loading"
+        color="warning"
+        outlined
+        @click="onCancelar"
+        >Cancelar</v-btn
+      >
+    </div>
   </div>
 </template>
 
@@ -171,26 +191,28 @@ export default {
       );
     },
     correcoesPendentes() {
-			return this.submissoes.length - this.exercicio.submissoesCount;
+      return this.submissoes.length - this.exercicio.submissoesCount;
     },
-		dateEntregaRelativo() {
-			return this.dataRelativa(this.exercicio.prazo);
-		},
-		dataEntregaISO(){
-			return dayjs(new Date(parseInt(this.form.prazo))).format('YYYY-MM-DD')
-		},
-		dataEntregaTimestamp () {
-			return dayjs(this.dataEntregaISO).valueOf();
-		},
-		dataEntregaDisplay (){
-			return dayjs(new Date(parseInt(this.form.prazo))).format('MMM D, YYYY - HH:mm')
-		}
+    dateEntregaRelativo() {
+      return this.dataRelativa(this.exercicio.prazo);
+    },
+    dataEntregaISO() {
+      return dayjs(new Date(parseInt(this.form.prazo))).format("YYYY-MM-DD");
+    },
+    dataEntregaTimestamp() {
+      return dayjs(this.dataEntregaISO).valueOf();
+    },
+    dataEntregaDisplay() {
+      return dayjs(new Date(parseInt(this.form.prazo))).format(
+        "MMM D, YYYY - HH:mm"
+      );
+    },
   },
   data() {
     return {
       form: {},
-			seletorData: false,
-			dayjs,
+      seletorData: false,
+      dayjs,
     };
   },
   methods: {
@@ -203,9 +225,11 @@ export default {
     resetarForm() {
       this.form = _.cloneDeep(this.exercicio);
     },
-		atualizarDataISO(data) {
-      this.form.prazo = String(dayjs(data).add(1, 'day').subtract(1, 'minute').valueOf());
-		}
+    atualizarDataISO(data) {
+      this.form.prazo = String(
+        dayjs(data).add(1, "day").subtract(1, "minute").valueOf()
+      );
+    },
   },
   mounted() {
     this.resetarForm();

@@ -71,8 +71,8 @@ module.exports = {
         },
         { $unset: "materia" },
         { "$unwind": "$exercicio" },
-
-
+        { $match: { "exercicio.visivel": true } },
+        { $unset: "exercicio.visivel" },
       ]).sort({ "exercicio.prazo": 1 })
     } catch (error) {
       console.log(error)
@@ -98,7 +98,7 @@ module.exports = {
       }, //Mesmo que o populate(materia)
       { "$unwind": "$materia" }, //Tira matéria do array
       { $match: { "materia.professor": id } }, //Exercicio pertente a matéria do professor
-      { $project: { _id: 1, titulo: 1, visivel: 1, descricao: 1, prazo: 1, submissoesCount: 1, "materia.nome": 1, "materia._id": 1 } } //Filtra apenas campos relevantes
+      { $project: { _id: 1, titulo: 1, visivel: 1, descricao: 1, prazo: 1, submissoesCount: 1, nomeFuncao: 1, "materia.nome": 1, "materia._id": 1 } } //Filtra apenas campos relevantes
       ])
       /*
       exercicios = await Exercicio.aggregate( [ { $group : { 
@@ -128,7 +128,7 @@ module.exports = {
         matricula = await Matricula.findOne({ aluno: userId, materia: materiaId })
         if (!matricula) throw "Usuário não esta matriculado nessa matéria.";
       }
-      exercicios = await Exercicio.find({ materia: materiaId })
+      exercicios = await Exercicio.find({ materia: materiaId, ...(role == "aluno" && {visivel: true}) });
       return res.status(200).send({ status: "success", message: "Exercícios encontrados!!!", data: { exercicios } })
 
     } catch (e) {
@@ -157,7 +157,6 @@ module.exports = {
     catch (e) {
       console.log(e);
       return res.status(401).send({ status: "error", message: e && typeof (e) === 'object' && e.array ? e.mapped() : e, data: null });
-
     }
     return res.status(200).send({ status: "success", message: "Exercício salvo!!!", data: { exercicio } })
 

@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="configuracao-item-header" :class="{ textfield: textfield }">
+    <div class="configuracao-item-header" :class="{ textfield: textfield, descricao: descricao }">
       <label :for="id">{{ label }}</label>
     </div>
-    <div class="configuracao-item-body">
+    <div class="configuracao-item-body" :class="{ textfield: textfield, descricao: descricao }">
       <div class="configuracao-item-conteudo">
         <span class="configuracao-item-descricao" v-if="descricao">{{
           descricao
@@ -84,8 +84,8 @@ export default {
     line-height: 17px;
     margin-bottom: 2px;
   }
-  .textfield {
-    margin-bottom: 0;
+  &.textfield label, &.descricao label{
+    margin-bottom: 0px;
   }
 }
 .configuracao-item-body {
@@ -103,6 +103,9 @@ export default {
       height: fit-content;
       padding-right: 2rem;
     }
+  }
+  &.textfield, &.descricao {
+    margin-top: -2px;
   }
 }
 ::v-deep.v-input--switch {
