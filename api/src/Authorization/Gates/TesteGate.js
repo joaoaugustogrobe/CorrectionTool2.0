@@ -1,4 +1,5 @@
 const Teste = require("../../models/Teste");
+const Exercicio = require("../../models/Exercicio");
 
 async function obter({ userId, testeId }) {
 	if (!userId, !testeId) return false;
@@ -17,8 +18,24 @@ async function obter({ userId, testeId }) {
 	return false;
 }
 
+async function criar({ userId, exercicioId }) {
+	if (!userId, !exercicioId) return false;
+
+	const exercicio = await Exercicio.findById(exercicioId).populate("materia", "professor");
+	console.log(exercicio);
+	if (!exercicio) return false;
+
+	if (exercicio.materia.professor == userId) return true;
+
+	return false;
+}
+
 async function salvar(payload) {
 	return this.obter(payload);
 }
 
-module.exports = { obter, salvar }
+async function deletar(payload) {
+	return this.obter(payload);
+}
+
+module.exports = { obter, salvar, criar, deletar };

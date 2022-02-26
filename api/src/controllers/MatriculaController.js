@@ -13,9 +13,11 @@ module.exports = {
     try {
       materia = await Materia.findById(materiaId);
       if (!materia)
-        throw "Matéria inexistente"
+        throw "Matéria inexistente";
       if (password != materia.password)
-        throw "Senha incorreta"
+        throw "Senha incorreta";
+      if (!materia.status)
+        throw "Matéria desabilitada";
       if (materia.capacidade >= materia.lotacao)
         throw "Matéria cheia";
     } catch (e) {

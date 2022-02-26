@@ -1,6 +1,6 @@
 <template>
   <v-dialog max-width="600px">
-    <template v-slot:activator="{ on }">
+    <template v-slot:activator="{ on }" @click="novoExercicio">
       <v-btn class="amber accent-3" fixed bottom right fab v-on="on">
         <v-icon>add</v-icon>
       </v-btn>
@@ -11,18 +11,37 @@
       </v-card-title>
       <v-card-text>
         <v-form class="px-3" ref="form">
-          <v-text-field label="Titulo" v-model="titulo" :rules="[rules.required, rules.min]"></v-text-field>
+          <v-text-field
+            dense
+            outlined
+            label="Titulo"
+            v-model="titulo"
+            :rules="[rules.required, rules.min]"
+          ></v-text-field>
           <v-textarea
             rows="3"
             auto-grow
+            dense
+            outlined
             label="Descrição"
             v-model="descricao"
             :rules="[rules.required, rules.min]"
           ></v-textarea>
+          <v-text-field
+            rows="3"
+            dense
+            outlined
+            label="nomeFuncao"
+            v-model="nomeFuncao"
+            placeholder="decomposicaoLU"
+            :rules="[rules.required, rules.nomeFuncao]"
+          ></v-text-field>
           <v-select
             v-model="materia"
             :items="materias"
             item-text="nome"
+            dense
+            outlined
             label="Matéria"
             item-value="_id"
             chips
@@ -53,14 +72,23 @@
               v-model="dataEntrega"
               @input="seletorData = false"
               locale="pt-BR"
-              :date-format="date => new Date(date)"
+              :date-format="(date) => new Date(date)"
             >
-              <v-btn text color="primary" @click="seletorData = false">Cencalar</v-btn>
-              <v-btn text color="primary" @click="$refs.datepicker.save(date)">OK</v-btn>
+              <v-btn text color="primary" @click="seletorData = false"
+                >Cencalar</v-btn
+              >
+              <v-btn text color="primary" @click="$refs.datepicker.save(date)"
+                >OK</v-btn
+              >
             </v-date-picker>
           </v-menu>
 
-          <v-btn class="success mx-0 mt-3" @click="submeter" :loading="submetendo">Adicionar Matéria</v-btn>
+          <v-btn
+            class="success mx-0 mt-3"
+            @click="submeter"
+            :loading="submetendo"
+            >Adicionar Matéria</v-btn
+          >
         </v-form>
       </v-card-text>
     </v-card>
@@ -85,13 +113,15 @@ export default {
       titulo: "",
       seletorData: false,
       dataEntrega: "",
+      nomeFuncao: "",
       materias: [],
-      materia: "",
+      materia: ""
       rules: {
-        min: v => v.length >= 15 || "Min 15 caracteres",
-        required: value => !!value || "Obrigatório."
+        min: (v) => v.length >= 15 || "Min 15 caracteres",
+        nomeFuncao: (v) =>  /^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(v) || "Função inválida",
+        required: (value) => !!value || "Obrigatório.",
       },
-      submetendo: false
+      submetendo: false,
     };
   },
   methods: {
@@ -100,20 +130,21 @@ export default {
       this.submetendo = true;
 
       let exerciciosRequisicoes = [];
-      this.materia.forEach(m => {
+      this.materia.forEach((materia) => {
         // Para cada materia selecionada, adicione um exercicio
         let exercicio = {
           titulo: this.titulo,
           descricao: this.descricao,
+          nomeFuncao: this.nomeFuncao,
           prazo: new Date(this.dataEntrega.replace(/-/g, "/")).getTime(),
           nota: 10,
-          materiaId: m
+          materiaId: materia,
         };
-        let exercicioRequisicao
+        let exercicioRequisicao;
         try {
           exercicioRequisicao = axios
             .post(`${backend.uri}/exercicio/create`, exercicio)
-            .then(res => {
+            .then((res) => {
               this.submetendo = false;
               exercicio = res.data.data.exercicio;
               this.log(exercicio);
@@ -132,13 +163,13 @@ export default {
         .then(() => {
           this.$store.commit("core/showMessage", {
             content: "Exercicios adicionados com sucesso!",
-            error: false
+            error: false,
           });
         })
         .catch(() => {
           this.$store.commit("core/showMessage", {
             content: "Erro ao adicionar um ou mais exercícios.",
-            error: true
+            error: true,
           });
         });
     },
@@ -156,18 +187,18 @@ export default {
       this.senhaMateria = "";
       this.exibirSenha = false;
       this.capacidade = 45;
-    }
+    },
   },
   computed: {
     dataFormatada() {
       let data = new Date(this.dataEntrega.replace(/-/g, "/")).getTime();
       return data ? this.converterData(data) : "";
-    }
+    },
   },
   created() {
-    axios.get(`${backend.uri}/materia`).then(res => {
+    axios.get(`${backend.uri}/materia`).then((res) => {
       let materias = res.data.data;
-      this.materias = materias.map(materia => {
+      this.materias = materias.map((materia) => {
         return { nome: materia.nome, _id: materia._id };
       });
     });
@@ -175,9 +206,9 @@ export default {
   props: {
     adicionarCallback: {
       type: Function,
-      required: false
-    }
-  }
+      required: false,
+    },
+  },
 };
 </script>
 

@@ -16,6 +16,10 @@
 
             <v-divider></v-divider>
 
+            <v-stepper-step step="+" key="addStep" editable>
+              Adicionar teste
+            </v-stepper-step>
+
             <!-- <v-divider></v-divider> -->
           </v-stepper-header>
 
@@ -26,7 +30,7 @@
               :key="index"
             >
               <div class="px-4 py-4">
-                <v-form v-if="testeIndex !== -1">
+                <v-form v-if="testeIndex !== -1" ref="form">
                   <v-row>
                     <v-col cols="12" class="mb-4">
                       <ConfiguracaoItem
@@ -43,6 +47,7 @@
                         v-model="formTeste.nome"
                         textfield
                         label="Titulo"
+                        :rules="[rules.required, rules.min]"
                       />
                     </v-col>
                     <v-col cols="12">
@@ -51,49 +56,31 @@
                         textfield
                         label="Mensagem de erro"
                         descricao="Mensagem de erro exibida ao aluno caso o teste falhe"
+                        :rules="[rules.required, rules.min]"
                       />
                     </v-col>
                   </v-row>
-                  <v-row v-for="(input, index) in formTeste.input" :key="index">
+                  <v-row v-for="(assinaturaArg, index) in exercicio.assinatura" :key="index">
                     <v-col>
-                      <ConfiguracaoItem :label="`Input ${index + 1}`">
+                      <ConfiguracaoItem :label="assinaturaArg">
                         <v-text-field
-                          :value="input"
+                          :value="formTeste.input[index]"
                           dense
                           outlined
                           append-icon="mdi-content-copy"
-                          append-outer-icon="mdi-delete"
-                          @input="(e)=>onAtualizarInput(index, e)"
-                          @click:append="() => onCopy(input)"
-                          @click:append-outer="() => onRemoverInput(index)"
+                          :rules="[rules.required]"
+                          @input="(e) => onAtualizarInput(formTeste.input[index], e)"
+                          @click:append="() => onCopy(formTeste.input[index])"
                         />
                       </ConfiguracaoItem>
                     </v-col>
                   </v-row>
-                  <v-row>
-                    <v-col>
-                      <ConfiguracaoItem
-                        :label="`Input ${formTeste.input.length + 1}`"
-                        descricao="Novo input"
-                      >
-                        <v-text-field
-                          v-model="novoInput"
-                          dense
-                          outlined
-                          append-icon="mdi-content-copy"
-                          append-outer-icon="mdi-plus"
-                          @click:append="() => onCopy(novoInput)"
-                          @click:append-outer="onAdicionarNovoInput"
-                        />
-                      </ConfiguracaoItem>
-                    </v-col>
-                  </v-row>
-                  {{ novoInput }}
                   <v-row>
                     <v-col>
                       <ConfiguracaoItem label="Output">
                         <v-text-field
                           v-model="formTeste.output"
+                          :rules="[rules.required]"
                           dense
                           outlined
                           append-icon="mdi-content-copy"
@@ -105,16 +92,100 @@
                 </v-form>
               </div>
             </v-stepper-content>
+
+            <v-stepper-content step="+">
+              <div class="px-4 py-4">
+                <v-form v-if="testeIndex !== -1" ref="form">
+                  <v-row>
+                    <v-col cols="12" class="mb-4">
+                      <ConfiguracaoItem
+                        v-model="formTeste.isPrivate"
+                        label="Teste privado"
+                        descricao="Testes privados exibirão inputs e outputs para alunos"
+                        has-switch
+                        :loading="loading"
+                        @input="onSalvar"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <ConfiguracaoItem
+                        v-model="formTeste.nome"
+                        textfield
+                        label="Titulo"
+                        :rules="[rules.required, rules.min]"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <ConfiguracaoItem
+                        v-model="formTeste.mensagemErro"
+                        textfield
+                        label="Mensagem de erro"
+                        descricao="Mensagem de erro exibida ao aluno caso o teste falhe"
+                        :rules="[rules.required, rules.min]"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row v-for="(assinaturaArg, index) in exercicio.assinatura" :key="index">
+                    <v-col>
+                      <ConfiguracaoItem :label="`Input ${index + 1}`" :descricao="assinaturaArg">
+                        <v-text-field
+                          :value="formTeste.input[index]"
+                          dense
+                          outlined
+                          append-icon="mdi-content-copy"
+                          :rules="[rules.required]"
+                          @input="(e) => onAtualizarInput(index, e)"
+                          @click:append="() => onCopy(formTeste.input[index])"
+                        />
+                      </ConfiguracaoItem>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <ConfiguracaoItem label="Output" descricao="y">
+                        <v-text-field
+                          v-model="formTeste.output"
+                          dense
+                          outlined
+                          append-icon="mdi-content-copy"
+                          :rules="[rules.required]"
+                          @click:append="() => onCopy(formTeste.output)"
+                        />
+                      </ConfiguracaoItem>
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </div>
+            </v-stepper-content>
           </v-stepper-items> </v-stepper
       ></v-col>
     </v-row>
-    <div class="py-3 my-3 float-right">
+    <div class="py-3 my-3 float-right" v-if="!isCriandoTeste">
       <v-btn
         v-if="testeAlterado && !loading"
         class="mx-2"
         color="primary"
         @click="onSalvar"
         >Salvar</v-btn
+      >
+      <v-btn
+        v-if="!loading"
+        class="mx-2"
+        color="red"
+        @click="onDeletar"
+        >Deletar</v-btn
+      >
+      <v-btn
+        v-if="testeAlterado && !loading"
+        color="warning"
+        outlined
+        @click="onCancelar"
+        >Cancelar</v-btn
+      >
+    </div>
+    <div class="py-3 my-3 float-right" v-else>
+      <v-btn v-if="!loading" class="mx-2" color="primary" @click="onCriar"
+        >Criar</v-btn
       >
       <v-btn
         v-if="testeAlterado && !loading"
@@ -129,11 +200,13 @@
 
 <script>
 import ConfiguracaoItem from "../../configuracao/Item.vue";
+import inputMixin from "../../../util/inputs";
 
 import _ from "lodash";
 import { mapGetters } from "vuex";
 
 export default {
+  mixins: [inputMixin],
   components: {
     ConfiguracaoItem,
   },
@@ -168,7 +241,22 @@ export default {
     },
     testeAlterado() {
       if (this.testeIndex === -1) return false;
-      return !_.isEqual(this.testes[this.testeIndex], this.formTeste);
+      if(this.isCriandoTeste) return !_.isEqual(this.formVazio, this.formTeste);
+      else return !_.isEqual(this.testes[this.testeIndex], this.formTeste);
+    },
+    formVazio() {
+      return {
+        input: [],
+        nome: "",
+        isPrivate: false,
+        mensagemErro: "",
+        _id: "",
+        output: "",
+        exercicio: "",
+      };
+    },
+    isCriandoTeste() {
+      return this.testeIndex === '+';
     },
   },
   methods: {
@@ -178,9 +266,26 @@ export default {
     onCancelar() {
       this.resetarForm();
     },
+    onDeletar() {
+      this.$store.dispatch("professor/deletarTeste", {testeId: this.formTeste._id, exercicioId: this.exercicio._id});
+      if(this.testes.length) this.testeIndex = 0;
+      else this.testeIndex = '+';
+    },
     resetarForm() {
+      this.$nextTick(()=>{
+        if(this.$refs.form[0])
+          this.$refs.form[0].resetValidation();
+        else if(this.$refs.form && this.$refs.form.resetValidation)
+          this.$refs.form.resetValidation();
+      });
+
       if (this.testeIndex === -1) return;
-      this.formTeste = _.cloneDeep(this.testes[this.testeIndex]);
+      if (!this.testes[this.testeIndex]) this.testeIndex = '+';
+      if(this.isCriandoTeste) {
+        this.formTeste = _.cloneDeep(this.formVazio);
+        this.formTeste.input = new Array(this.exercicio.assinatura && this.exercicio.assinatura.length).fill('');
+      }
+      else this.formTeste = _.cloneDeep(this.testes[this.testeIndex]);
     },
     onCopy(e) {
       navigator.clipboard.writeText(e);
@@ -189,17 +294,21 @@ export default {
         error: false,
       });
     },
+    onCriar() {
+      if(this.validarForm())
+        this.$store.dispatch("professor/criarTeste", {...this.formTeste, exercicioId: this.exercicio._id});
+    },
     onAdicionarNovoInput() {
       if (this.novoInput) {
         this.formTeste.input.push(this.novoInput);
         this.novoInput = "";
       }
     },
-    onRemoverInput(index) {
-      this.formTeste.input.splice(index, 1);
-    },
     onAtualizarInput(index, input) {
       this.formTeste.input.splice(index, 1, input);
+    },
+    validarForm() {
+      return this.$refs.form.validate();
     }
   },
   watch: {
@@ -213,8 +322,8 @@ export default {
       deep: true,
       handler() {
         this.resetarForm();
-      }
-    }
+      },
+    },
   },
 };
 </script>
@@ -222,5 +331,15 @@ export default {
 <style scoped>
 .col {
   padding: 0 12px;
+}
+::v-deep .v-stepper__header{
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+}
+::v-deep .v-stepper__step{
+  flex-shrink: 0;
+}
+::v-deep .v-divider{
+  min-width: 30px;
 }
 </style>

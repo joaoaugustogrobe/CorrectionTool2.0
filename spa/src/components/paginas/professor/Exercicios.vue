@@ -1,7 +1,7 @@
 <template>
   <div class="exercicios">
     <v-subheader class="grey--text">EXERCÍCIOS</v-subheader>
-    <adicionar-exercicio :adicionarCallback="adicionarExercicio"/>
+    <!-- <adicionar-exercicio :adicionarCallback="adicionarExercicio"/> -->
 
     <v-container class="my-5">
       <v-layout row class="mb-3">
@@ -39,13 +39,19 @@
       {{exercicio}}
       </card-exercicio>
     </v-container>
+
+    <v-btn class="amber accent-3" fixed bottom right fab @click="onNovoExercicio">
+      <v-icon>add</v-icon>
+    </v-btn>
+    <AdicionarExercicio />
   </div>
 </template>
 
 
 <script>
 import CardExercicio from "../../template/CardExercicio";
-import AdicionarExercicio from "../../template/AdicionarExercicio";
+// import AdicionarExercicio from "../../template/AdicionarExercicio";
+import AdicionarExercicio from "../../modals/WizardCadastroExercicio.vue";
 import backend from '../../../backend'
 import axios from 'axios'
 axios.defaults.withCredentials = true;
@@ -82,7 +88,12 @@ export default {
   },
   components: {
     "card-exercicio": CardExercicio,
-    "adicionar-exercicio": AdicionarExercicio
+    AdicionarExercicio,
+  },
+  methods: {
+    onNovoExercicio(){
+      this.$modal.show('cadastro-exercicio');
+    }
   },
   created(){
     axios.get(`${backend.uri}/exercicios`).then(res => {

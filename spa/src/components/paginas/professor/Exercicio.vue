@@ -25,6 +25,7 @@
                   :step="n"
                   edit-icon="arrow_drop_down"
                   editable
+                  @click="onAbrirTestes"
                   >Teste {{ n }}</v-stepper-step
                 >
                 <v-divider v-if="n !== testes.length" :key="n"></v-divider>
@@ -35,101 +36,11 @@
                 :complete="stepperAtivo > testes.length + 1"
                 step="+"
                 editable
+                @click="onAbrirTestes"
               >
-                <span>Adicionar novo teste</span>
+                <span>Adicionar teste</span>
               </v-stepper-step>
             </v-stepper-header>
-
-            <v-stepper-items>
-              <v-stepper-content
-                v-for="n in testes.length"
-                :key="`${n}-content`"
-                :step="n"
-              >
-                <span class="title">Entrada:</span>
-                <v-row align="start">
-                  <v-col
-                    v-for="(teste, i) in testes[n - 1].input"
-                    :key="i"
-                    md="2"
-                  >
-                    <v-text-field
-                      :value="teste"
-                      outlined
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-                <span class="title">Saida:</span>
-                <v-textarea
-                  rows="1"
-                  :value="testes[n - 1].output"
-                  outlined
-                  readonly
-                ></v-textarea>
-                <div v-if="testes[n - 1].isPrivate">
-                  <v-icon small>lock</v-icon>
-                  <span>Este teste é privado</span>
-                </div>
-              </v-stepper-content>
-              <v-stepper-content step="+">
-                <v-form ref="form">
-                  <span class="title">Entrada:</span>
-                  {{ testeSendoAdicionado.input }}
-                  <v-row align="start">
-                    <v-col
-                      md="2"
-                      v-for="i in testeSendoAdicionado.input.length + 1"
-                      :key="i"
-                      class="mr-2"
-                    >
-                      <v-text-field
-                        v-model="testeSendoAdicionado.input[i - 1]"
-                        outlined
-                        :label="`Argumento ${i}`"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="1">
-                      <v-btn text fab @click="testeSendoAdicionado.input.pop()">
-                        <v-icon>remove</v-icon>
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>
-                      <v-textarea
-                        v-model="testeSendoAdicionado.output"
-                        outlined
-                        rows="3"
-                        :rules="rules"
-                      ></v-textarea>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>
-                      <v-checkbox
-                        v-model="testeSendoAdicionado.isPrivate"
-                        label="Teste privado"
-                      ></v-checkbox>
-                    </v-col>
-                  </v-row>
-                  <v-row justify="end">
-                    <v-col class="mx-2" md="1">
-                      <v-btn @click="limparForm">Limpar</v-btn>
-                    </v-col>
-                    <v-col md="1">
-                      <v-btn
-                        class="success"
-                        @click="adicionarTeste"
-                        :loading="salvandoTeste"
-                      >
-                        <v-icon>add</v-icon>Salvar
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-stepper-content>
-            </v-stepper-items>
           </v-stepper>
         </v-flex>
         <div v-if="!carregando" class="mt-4">
@@ -242,35 +153,12 @@ export default {
 
       this.carregando = false;
     },
+    onAbrirTestes(){
+      this.$modal.show('alterar-exercicio', {tab: 'testes', exercicio: this.exercicio});
+    },
   },
   mounted() {
     this.init();
-    return;
-    const promisses = [
-      axios.get(`${backend.uri}/${this.$route.params.id}/show`).then((res) => {
-        this.exercicio = res.data.data.exercicio;
-      }),
-      this.$store.dispatch("professor/obterMateria", {
-        materiaId: this.exercicio.materia._id,
-      }),
-      axios
-        .get(`${backend.uri}/resolucoes/${this.$route.params.id}`)
-        .then((res) => {
-          this.submissoes = res.data.data.resolucoes;
-        }),
-      axios
-        .get(`${backend.uri}/exercicio/${this.$route.params.id}/testes`)
-        .then((res) => {
-          this.testes = res.data.data.testes;
-        }),
-    ];
-
-    Promise.all(promisses).then(() => {
-      this.carregando = false;
-      this.$store.dispatch("professor/obterMateria", {
-        materiaId: this.exercicio.materia._id,
-      });
-    });
   },
 };
 </script>

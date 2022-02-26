@@ -43,7 +43,7 @@ routes.post('/matricula/create', (req, res, next) => SessionController.validar(r
 routes.post('/matricula/deletar', (req, res, next) => SessionController.validar(req, res, next), MatriculaController.cancelarMatricula)
 
 
-routes.post('/exercicio/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.store);
+routes.post('/exercicio/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/exercicio/create']), ExercicioController.store);
 routes.get('/exercicios/', (req, res, next) => SessionController.validar(req, res, next, "professor"), ExercicioController.getExerciciosProfessor);
 routes.get('/exercicio/show/all', (req, res, next) => SessionController.validar(req, res, next, "aluno"), ExercicioController.getExerciciosAluno);
 routes.get('/exercicio/show/:materiaId', (req, res, next) => SessionController.validar(req, res, next), ExercicioController.getExerciciosMateria);
@@ -57,9 +57,10 @@ routes.get('/resolucao/:exercicioId', (req, res, next) => SessionController.vali
 routes.get('/resolucao/:resolucaoId/download', (req, res, next) => SessionController.validar(req, res, next), ResolucaoController.download);
 
 //Testes
-routes.post('/testes/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), TesteController.store);
+routes.post('/testes/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/testes/create']), TesteController.store);
 routes.get('/exercicio/:exercicioId/testes', (req, res, next) => SessionController.validar(req, res, next), TesteController.getTestesExercicio);
 routes.post('/testes/salvar', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/testes/salvar']), TesteController.salvar);
+routes.post('/testes/deletar', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/testes/deletar']), TesteController.deletar);
 
 //ResolucaoTeste
 routes.get('/resolucao/testes/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), ResolucaoTesteController.obterNotasResolucao);

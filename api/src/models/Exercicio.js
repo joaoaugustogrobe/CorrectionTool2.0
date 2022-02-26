@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const exercicioSchema = new mongoose.Schema({
-  nota: {
-    type: Number,
-    trim: true,
-    required: true
-  },
   prazo: {
     type: String,
     trim: true,
@@ -21,7 +16,7 @@ const exercicioSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function(v) {
-        return /^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(v);
+        return /^[a-zA-Z_$][a-zA-Z_$0-9]{2,30}$/.test(v);
       },
       message: props => `${props.value} nomeFuncao inválido.`
     },
@@ -55,6 +50,11 @@ const exercicioSchema = new mongoose.Schema({
   visivel: {
     type: Boolean,
     default: false,
+  },
+  assinatura: {
+    type: Array,
+    required: true,
+    default: [],
   },
 });
 

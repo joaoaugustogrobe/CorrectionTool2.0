@@ -41,23 +41,37 @@ export default {
       Vue.set(state.testes, exercicioId, testes);
     },
     salvarTesteExercicio: (state, payload) => {
-      const {teste, exercicioId} = payload;
-      console.log("salvarTesteExercicio", payload);
-      const testeIndex = _.findIndex(state.testes[exercicioId], {_id: teste._id});
-      console.log(testeIndex);
-      if(testeIndex >= 0)
+      const { teste, exercicioId } = payload;
+      const testeIndex = _.findIndex(state.testes[exercicioId], { _id: teste._id });
+      if (testeIndex >= 0)
         Vue.set(state.testes[exercicioId], testeIndex, teste);
+    },
+    deletarTesteExercicio: (state, { testeId, exercicioId }) => {
+      let testes = state.testes[exercicioId];
+      const testeIndex = _.findIndex(testes, { _id: testeId });
+      if(testeIndex >= 0){
+        Vue.delete(state.testes[exercicioId], testeIndex);
+      }
+    },
+    criarTesteExercicio: (state, { teste, exercicioId }) => {
+      let testes = state.testes[exercicioId];
+      testes.push(teste);
+      Vue.set(state.testes, exercicioId, testes);
     },
     guardarAlunos: (state, payload) => {
       const { alunos, materiaId } = payload;
 
       Vue.set(state.alunos, materiaId, alunos);
     },
-    guardarExercicio: (state, {exercicioId, exercicio}) => {
-      const exercicioIndex = _.findIndex(state.exercicios, {_id: exercicioId});
-      if(exercicioId === -1) return;
-
+    guardarExercicio: (state, { exercicioId, exercicio }) => {
+      const exercicioIndex = _.findIndex(state.exercicios, { _id: exercicioId });
+      if (exercicioId === -1) return;
       Vue.set(state.exercicios, exercicioIndex, exercicio);
+    },
+    criarExercicio: (state, exercicio) => {
+      let exercicios = state.exercicios;
+      exercicios.push(exercicio);
+      Vue.set(state, 'exercicios', exercicios);
     }
   },
   actions: {
@@ -203,9 +217,27 @@ export default {
 
       context.dispatch('obterAlunosMateria', materia._id);
     },
+    async criarExercicio(context, payload){
+      const req = await context.state.client.post('exercicio/create', payload);
+
+      if (req.ok) {
+        context.commit('criarExercicio', req.data.data.exercicio);
+        
+        context.commit("core/showMessage", {
+          content: "Exercício criado com sucesso!",
+          error: false,
+        }, { root: true });
+      } else {
+        context.commit("core/showMessage", {
+          content: "Falha ao salvar exercício!",
+          error: true
+        }, { root: true });
+      }
+      return req;
+    },
     async salvarExercicio(context, { titulo, descricao, _id, prazo, visivel }) {
       const req = await context.state.client.post('exercicio/salvar', { titulo, descricao, exercicioId: _id, prazo, visivel });
-      
+
       if (req.ok) {
         context.commit('guardarExercicio', {
           exercicioId: _id,
@@ -272,10 +304,10 @@ export default {
     },
 
     async salvarTeste(context, payload) {
-      const req = await context.state.client.post('testes/salvar', {...payload, testeId: payload._id});
+
+      const req = await context.state.client.post('testes/salvar', { ...payload, testeId: payload._id, exercicioId: payload.exercicio});
 
       if (req.ok) {
-        console.log(req.data.data.teste);
         context.commit('salvarTesteExercicio', {
           exercicioId: req.data.data.teste.exercicio,
           teste: req.data.data.teste
@@ -289,8 +321,47 @@ export default {
           content: "Falha ao salvar teste!",
           error: true
         }, { root: true });
-      }      
+      }
+    },
 
+    async criarTeste(context, payload) {
+      const req = await context.state.client.post('testes/create', payload);
+
+      if (req.ok) {
+        context.commit('criarTesteExercicio', {
+          exercicioId: req.data.data.teste.exercicio,
+          teste: req.data.data.teste
+        });
+        context.commit("core/showMessage", {
+          content: "Teste criado com sucesso!",
+          error: false,
+        }, { root: true });
+      } else {
+        context.commit("core/showMessage", {
+          content: "Falha ao criar teste!",
+          error: true
+        }, { root: true });
+      }
+    },
+
+    async deletarTeste(context, {testeId, exercicioId}) {
+      const req = await context.state.client.post('testes/deletar', { testeId });
+
+      if (req.ok) {
+        context.commit('deletarTesteExercicio', {
+          exercicioId,
+          testeId,
+        });
+        context.commit("core/showMessage", {
+          content: "Teste deletado com sucesso!",
+          error: false,
+        }, { root: true });
+      } else {
+        context.commit("core/showMessage", {
+          content: "Falha ao deletar teste!",
+          error: true
+        }, { root: true });
+      }
     }
   },
   getters: {

@@ -19,11 +19,13 @@ module.exports = {
     try {
       if (!req.file) throw "É necessario fazer o upload de um arquivo.";
       const { filename, originalname } = req.file;
-      exercicio = await Exercicio.findById(exercicioId);
+      exercicio = await Exercicio.findById(exercicioId).populate('materia status');
       if (!exercicio) throw "Exercício inexistente.";
+      if (!exercicio.status) throw "Matéria desabilitada";
 
-      prazoDiff = Date.now() - exercicio.prazo;
-      if (prazoDiff > 0) throw "Submissão atrasada.";
+      // prazoDiff = Date.now() - exercicio.prazo;
+      // if (prazoDiff > 0) throw "Submissão atrasada.";
+
       //-----
       //Salvar arquivo
       resolucao = await Resolucao.findOne({

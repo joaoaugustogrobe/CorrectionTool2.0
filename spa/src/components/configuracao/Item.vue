@@ -18,6 +18,7 @@
           :value="value"
           :disabled="disabled"
           @input="(e) => $emit('input', e)"
+          :rules="rules"
         />
         <slot />
       </div>
@@ -66,6 +67,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    rules: {
+      type: Array,
+      default: () => []
+    }
   },
   data() {
     return {

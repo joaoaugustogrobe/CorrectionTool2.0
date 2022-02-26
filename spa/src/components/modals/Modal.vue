@@ -11,10 +11,10 @@
     width="1000px"
     height="95%"
   >
-    <div class="modal-tabs" v-if="!isMobile">
+    <div class="modal-tabs" v-if="!isMobile && hasTabs">
       <slot name="tabs"></slot>
     </div>
-    <div class="modal-body-wrapper">
+    <div class="modal-body-wrapper" :class="{['no-tabs']: !hasTabs}">
       <div class="modal-header">
         <h4>{{ title }}</h4>
         <v-icon @click="close">fa-times</v-icon>
@@ -67,6 +67,9 @@ export default {
       return false;
       return this.$store.state.core.isMobile;
     },
+    hasTabs() {
+      return !!this.$scopedSlots['tabs'];
+    }
   },
   methods: {
     close: function () {
@@ -156,6 +159,10 @@ export default {
       flex-direction: column;
       border-radius: 0 10px 10px 0;
       background-color: var(--bg-light);
+
+      &.no-tabs{
+        width: 1000px;
+      }
 
       .modal-header {
         background-color: var(--bg-light);

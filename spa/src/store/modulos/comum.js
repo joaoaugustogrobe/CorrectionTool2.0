@@ -46,6 +46,15 @@ export default {
 
 			return req;
 		},
+		async downloadTemplate(context, {filename, template}) {
+			var element = document.createElement('a');
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(template));
+			element.setAttribute('download', `${filename}.m`);
+			element.style.display = 'none';
+			document.body.appendChild(element);
+			element.click();
+			document.body.removeChild(element);
+		}
 	},
 	getters: {
 		comentarios: state => resolucaoId => {

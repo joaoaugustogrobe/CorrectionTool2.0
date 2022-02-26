@@ -2,7 +2,7 @@
   <Modal
     name="alterar-exercicio"
     className="alterar-exercicio"
-    title="Newton"
+    :title="exercicio && exercicio.titulo"
     @before-open="onOpen"
   >
     <template v-slot:tabs>
@@ -37,6 +37,7 @@
         <li
           :class="{ active: page === 'notas' }"
           @click="page = 'notas'"
+          v-if="false"
           v-tooltip="{
             delay: { show: 500 },
             content: 'Testes',
@@ -98,6 +99,7 @@ export default {
     onOpen({ params }) {
       if (params) {
         this.exercicioId = params.exercicio._id;
+        this.page = params.tab ? params.tab : 'configuracoes';
       }
     },
   },

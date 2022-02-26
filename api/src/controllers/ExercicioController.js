@@ -9,30 +9,25 @@ const {mapErrors} = require('../Validation/index');
 
 module.exports = {
   async store(req, res) {
-    const { materiaId, titulo, descricao, prazo, nota } = req.body;
+    const { user, materiaId, titulo, descricao, prazo, nomeFuncao, assinatura } = req.body;
 
-    let materia, exercicio;
+    let exercicio;
 
     try {
-      if (!materiaId || !titulo || !descricao || !prazo || !nota)
-        throw "Informações inválidas..";
-
-      materia = await Materia.findById(materiaId);
-      if (!materia) throw "Matéria inexistente.";
-      if (materia.professor != req.body.userId)
-        throw "Esta matéria não pertence a esse usuário.";
+      mapErrors(req).throw();
+      if (await user.cannot("exercicio/criar", { materiaId })) throw "Permissão insuficiente";
 
       exercicio = await Exercicio.create({
         titulo,
         descricao,
         prazo,
-        nota,
-        status: "pendente",
-        materia: materiaId
+        nomeFuncao,
+        materia: materiaId,
+        assinatura
       })
       exercicio = await exercicio.populate("materia", "nome").execPopulate()
     } catch (e) {
-      return res.status(401).send({ status: "error", message: e, data: null });
+      return res.status(401).send({ status: "error", message: e && typeof (e) === 'object' && e.array ? e.mapped() : e, data: null });
     }
     return res.status(200).send({ status: "success", message: "Exercício cadastrado!!!", data: { exercicio } })
   },
@@ -98,14 +93,9 @@ module.exports = {
       }, //Mesmo que o populate(materia)
       { "$unwind": "$materia" }, //Tira matéria do array
       { $match: { "materia.professor": id } }, //Exercicio pertente a matéria do professor
-      { $project: { _id: 1, titulo: 1, visivel: 1, descricao: 1, prazo: 1, submissoesCount: 1, nomeFuncao: 1, "materia.nome": 1, "materia._id": 1 } } //Filtra apenas campos relevantes
+      { $project: { _id: 1, titulo: 1, visivel: 1, descricao: 1, prazo: 1, submissoesCount: 1, assinatura: 1, nomeFuncao: 1, "materia.nome": 1, "materia._id": 1 } } //Filtra apenas campos relevantes
       ])
-      /*
-      exercicios = await Exercicio.aggregate( [ { $group : { 
-        _id : "$materia",
-        nome: {$first: "$lookup"}
-        }} 
-      ])*/
+
 
       return res.status(200).send({ status: "success", message: "Exercícios encontrados!!!", data: { exercicios } })
     } catch (e) {

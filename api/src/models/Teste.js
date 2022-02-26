@@ -29,5 +29,6 @@ const testeSchema = new mongoose.Schema({
     }
 })
 
+testeSchema.plugin(require('mongoose-delete'), {deletedAt: true, overrideMethods: true});
 
 module.exports = mongoose.model('Teste', testeSchema);

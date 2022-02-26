@@ -18,7 +18,7 @@ function infunc() {
 		butify();
 	}
 }
-var new_lines = 1;
+var new_lines = 0;
 var isStr = false;
 var isComm = -1;
 var isfunc = 0;
@@ -29,6 +29,7 @@ var inspace2 = '  ';
 export function butify(source, options) {
     const {spaces=4, identBody=true, addSpaceAfter=false} = options;
 
+	console.log(new_lines);
 	//------------clear-extra-lines-and-spaces-and-put-the-code-in-clean-lines---------//
 	if (spaces == 4) {
 		inspace = '    ';

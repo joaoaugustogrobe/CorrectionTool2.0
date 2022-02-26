@@ -35,6 +35,7 @@
         </li>
 
         <li
+          v-if="false"
           :class="{ active: page === 'notas' }"
           @click="page = 'notas'"
           v-tooltip="{
