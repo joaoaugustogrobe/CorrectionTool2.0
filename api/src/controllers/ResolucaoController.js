@@ -19,7 +19,9 @@ module.exports = {
     try {
       if (!req.file) throw "É necessario fazer o upload de um arquivo.";
       const { filename, originalname } = req.file;
-      exercicio = await Exercicio.findById(exercicioId).populate('materia status');
+      console.log("exercicioId", exercicioId);
+      exercicio = await Exercicio.findById(exercicioId).populate('materia');
+      console.log(exercicio);
       if (!exercicio) throw "Exercício inexistente.";
       if (!exercicio.status) throw "Matéria desabilitada";
 
@@ -46,6 +48,7 @@ module.exports = {
         resolucao.resolucaoFilename = originalname;
         resolucao.status = 'pendente';
 
+        console.log('resolucao existente, sobrescrevendo')
         await resolucao.save();
       } else {
         resolucao = await Resolucao.create({
@@ -58,6 +61,7 @@ module.exports = {
         exercicio.submissoesCount++;
         await exercicio.save()
       }
+      console.log(tempPath, definitivoPath)
       FileUploadController.rename(tempPath, definitivoPath, originalname);
       console.log("Submetido! gerando execução")
       let correcao = await prepararCorrecao(resolucao)
@@ -93,7 +97,6 @@ module.exports = {
         throw "Materia não pertence a este professor";
       if (!exercicio) throw "Exercício inexistente.";
 
-      console.log('buscando resolucoes')
       resolucoes = await Resolucao.aggregate([
         {
           '$match': {
@@ -166,7 +169,6 @@ module.exports = {
           }
         }
       ]);
-      console.log(resolucoes);
 
 
     } catch (e) {
@@ -185,7 +187,7 @@ module.exports = {
     try {
       resolucao = await Resolucao.findOne(
         { exercicio: exercicioId, aluno: userId },
-        "exercicio resolucaoFilename tentativas dataSubmissao status"
+        // "exercicio resolucaoFilename tentativas dataSubmissao status"
       );
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null });

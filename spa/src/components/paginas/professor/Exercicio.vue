@@ -18,17 +18,17 @@
         <v-flex>
           <v-stepper v-model="stepperAtivo">
             <v-stepper-header>
-              <template v-for="n in testes.length">
+              <template v-for="(teste, index) in testes">
                 <v-stepper-step
-                  :key="`${n}-step`"
-                  :complete="stepperAtivo > n"
-                  :step="n"
+                  :key="`${index}-step`"
+                  :complete="stepperAtivo > index"
+                  :step="index"
                   edit-icon="arrow_drop_down"
                   editable
                   @click="onAbrirTestes"
-                  >Teste {{ n }}</v-stepper-step
+                  >{{teste.nome}}</v-stepper-step
                 >
-                <v-divider v-if="n !== testes.length" :key="n"></v-divider>
+                <v-divider v-if="index !== testes.length" :key="index"></v-divider>
               </template>
               <v-divider key="divider"></v-divider>
               <v-stepper-step

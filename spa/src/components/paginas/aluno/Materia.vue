@@ -2,63 +2,99 @@
   <v-container>
     <v-card :loading="carregando">
       <v-card-text>
-        <span class="title black--text">{{materia.nome}}</span>
-        <v-btn v-tooltip="'test'">Sair</v-btn>
+        <span class="title black--text">{{ materia.nome }}</span>
         <v-expansion-panels class="mt-3">
           <v-expansion-panel
             @change="onExpansionChange(exercicio)"
-            :class="`${exercicio.prazo - new Date().getTime() > 0 ? 'adiantado' : 'atrazado'}`"
+            :class="`${
+              exercicio.prazo - new Date().getTime() > 0
+                ? 'adiantado'
+                : 'atrazado'
+            }`"
             v-for="exercicio in exercicios"
             :key="exercicio._id"
           >
             <v-expansion-panel-header>
               <v-row class="pa-0" justify="space-between">
                 <v-col class="pa-0" md="4">
-                  <span class="font-weight-bold subtitle-1">{{exercicio.titulo}}</span>
+                  <span class="font-weight-bold subtitle-1">{{
+                    exercicio.titulo
+                  }}</span>
                 </v-col>
-                <v-col class="pa-0" md="2">
+                <v-col class="pa-0" md="3">
                   <v-icon
-                    :color="`${exercicio.prazo - new Date().getTime() > 0 ? 'green' : 'red'}`"
-                  >alarm</v-icon>
+                    :color="`${
+                      exercicio.prazo - new Date().getTime() > 0
+                        ? 'green'
+                        : 'red'
+                    }`"
+                    >alarm</v-icon
+                  >
                   <span
-                    :class="`${exercicio.prazo - new Date().getTime() > 0 ? 'green--text' : 'red--text'}`"
-                  >{{converterData(exercicio.prazo)}}</span>
+                    :class="`${
+                      exercicio.prazo - new Date().getTime() > 0
+                        ? 'green--text'
+                        : 'red--text'
+                    }`"
+                    >{{ converterData(exercicio.prazo) }}</span
+                  >
                 </v-col>
               </v-row>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <p>{{exercicio.descricao}}</p>
+              <p>{{ exercicio.descricao }}</p>
+              <TemplateExercicio
+                :exercicio="exercicio"
+                :assinaturaFuncao="exercicio.assinatura"
+                class="mb-6"
+              />
               <div v-if="exercicio.testes && exercicio.testes.length > 0">
                 <h3>Testes</h3>
                 <v-stepper v-model="testeAtivo" class="my-4">
                   <v-stepper-header>
-                    <template v-for="n in exercicio.testes.length">
+                    <template v-for="(teste, index) in exercicio.testes">
                       <v-stepper-step
-                        :key="`${n}-step`"
-                        :complete="testeAtivo > n"
-                        :step="n"
+                        :key="`${index}-step`"
+                        :step="index"
                         edit-icon="arrow_drop_down"
                         editable
-                      >Teste {{n}}</v-stepper-step>
-                      <v-divider v-if="n !== exercicio.testes.length" :key="n"></v-divider>
+                        >{{ teste.nome }}</v-stepper-step
+                      >
+                      <v-divider
+                        v-if="index !== exercicio.testes.length"
+                        :key="index"
+                      ></v-divider>
                     </template>
                   </v-stepper-header>
 
                   <v-stepper-items>
                     <v-stepper-content
-                      v-for="n in exercicio.testes.length"
-                      :key="`${n}-content`"
-                      :step="n"
+                      v-for="(teste, index) in exercicio.testes"
+                      :key="`${index}-content`"
+                      :step="index"
                     >
                       <span class="title">Entrada:</span>
                       <v-row align="start">
-                        <v-col v-for="(teste, i) in exercicio.testes[n - 1].input" :key="i" md="2">
-                          <v-text-field :value="teste" outlined readonly></v-text-field>
+                        <v-col
+                          v-for="(input, i) in teste.input"
+                          :key="i"
+                          md="2"
+                        >
+                          <v-text-field
+                            :value="input"
+                            outlined
+                            readonly
+                          ></v-text-field>
                         </v-col>
                       </v-row>
                       <span class="title">Saida:</span>
-                      <v-textarea rows="1" :value="exercicio.testes[n-1].output" outlined readonly></v-textarea>
-                      <div v-if="exercicio.testes[n-1].isPrivate">
+                      <v-textarea
+                        rows="1"
+                        :value="teste.output"
+                        outlined
+                        readonly
+                      ></v-textarea>
+                      <div v-if="teste.isPrivate">
                         <v-icon small>lock</v-icon>
                         <span>Este teste é privado</span>
                       </div>
@@ -82,16 +118,37 @@
               <v-row>
                 <v-col>
                   <div v-if="exercicio.resolucao">
-                    <span class="font-weight-bold subtitle-1">Sua resolução:</span>
+                    <span class="font-weight-bold subtitle-1"
+                      >Sua resolução:</span
+                    >
                     <a
                       :href="`${backendUri}/resolucao/${exercicio.resolucao._id}/download`"
-                    >{{exercicio.resolucao.resolucaoFilename}}</a>
-                    <span>, submetido em</span>
-                    <span>{{converterData(exercicio.resolucao.dataSubmissao)}}</span>
+                      >{{ exercicio.resolucao.resolucaoFilename }}</a
+                    >
+                    <span>, submetido em </span>
+                    <span>{{
+                      converterData(exercicio.resolucao.dataSubmissao)
+                    }}</span>
                   </div>
                   <div v-else>
-                    <span class="font-weight-bold subtitle-1">Você ainda não submeteu uma resolução.</span>
+                    <span class="font-weight-bold subtitle-1"
+                      >Você ainda não submeteu uma resolução.</span
+                    >
                   </div>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-alert
+                    dense
+                    type="success"
+                    @click="() => onVisualizarResolucao(exercicio)"
+                    v-if="exercicio && exercicio.resolucao"
+                  >
+                    Correção para
+                    <strong>{{ exercicio.resolucao.resolucaoFilename }}</strong>
+                    esta pronta.
+                  </v-alert>
                 </v-col>
               </v-row>
               <v-row class="align-center justify-end">
@@ -99,7 +156,11 @@
                   <v-icon>help_outline</v-icon>
                   <span>Ajuda</span>
                 </v-btn>
-                <v-dialog max-width="600px" v-model="dialogConfirmacao" v-if="exercicio.resolucao">
+                <v-dialog
+                  max-width="600px"
+                  v-model="dialogConfirmacao"
+                  v-if="exercicio.resolucao"
+                >
                   <template v-slot:activator="{ on }">
                     <v-btn outlined color="green" v-on="on">
                       <span>Enviar</span>
@@ -109,29 +170,39 @@
                     <v-card-title>Cuidado</v-card-title>
                     <v-card-text>
                       <span class="subtitle-1 black--text">
-                        A submissão dessa atividade irá sobrescrever a submissão anterior (
-                        <b>{{exercicio.resolucao.resolucaoFilename}}</b>). Você tem certeza que deseja prosseguir ?
+                        A submissão dessa atividade irá sobrescrever a submissão
+                        anterior (
+                        <b>{{ exercicio.resolucao.resolucaoFilename }}</b
+                        >). Você tem certeza que deseja prosseguir ?
                       </span>
                     </v-card-text>
                     <v-card-actions>
-                      <v-btn text color="red" @click="dialogConfirmacao = false">Cancelar</v-btn>
+                      <v-btn text color="red" @click="dialogConfirmacao = false"
+                        >Cancelar</v-btn
+                      >
                       <v-spacer></v-spacer>
-                      <v-btn outlined color="green" @click="upload(exercicio)">Enviar</v-btn>
+                      <v-btn outlined color="green" @click="upload(exercicio)"
+                        >Enviar</v-btn
+                      >
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
-                <v-btn outlined color="green" @click="upload(exercicio)" v-else>Enviar</v-btn>
+                <v-btn outlined color="green" @click="upload(exercicio)" v-else
+                  >Enviar</v-btn
+                >
               </v-row>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
         <template v-if="exercicios.length == 0">
-          <span
-            class="subtitle-1 black--text"
-          >Esta matéria ainda não possui nenhum exercício. Aguarde até que seu professor libere algum exercícios.</span>
+          <span class="subtitle-1 black--text"
+            >Esta matéria ainda não possui nenhum exercício. Aguarde até que seu
+            professor libere algum exercícios.</span
+          >
         </template>
       </v-card-text>
     </v-card>
+    <VisualizarExercicio />
   </v-container>
 </template>
 
@@ -140,23 +211,29 @@ import dataMixin from "../../../util/date";
 import backend from "../../../backend";
 import axios from "axios";
 axios.defaults.withCredentials = true;
+import TemplateExercicio from "../../comum/TemplateExercicio.vue";
+import VisualizarExercicio from "../../modals/VisualizacaoExercicio/Exercicio.vue";
+
 export default {
   mixins: [dataMixin],
+  components: {
+    TemplateExercicio,
+    VisualizarExercicio,
+  },
   data() {
     return {
       backendUri: backend.uri,
       dialogConfirmacao: false,
       materia: {
         nome: "",
-        professor: ""
+        professor: "",
       },
-      exercicios: [{}],
       carregando: true,
       regras: {
-        required: value => !!value || "Obrigatório."
+        required: (value) => !!value || "Obrigatório.",
       },
       ev: null,
-      testeAtivo: ""
+      testeAtivo: 0,
     };
   },
   methods: {
@@ -168,21 +245,22 @@ export default {
         axios
           .post(`${backend.uri}/resolucao/submit`, formData, {
             headers: {
-              "Content-Type": "multipart/form-data"
-            }
+              "Content-Type": "multipart/form-data",
+            },
           })
-          .then(res => {
+          .then((res) => {
             this.$store.commit("core/showMessage", {
               content: "Submissão enviada com sucesso",
-              error: false
+              error: false,
             });
             /* eslint-disable no-console */
             console.log(res);
             /* eslint-enable no-console */
           })
-          .catch(e => {
+          .catch((e) => {
             this.$store.commit("core/showMessage", {
-              content: "Falha ao enviar submissão. Por favor, tente novamente mais tarde.",
+              content:
+                "Falha ao enviar submissão. Por favor, tente novamente mais tarde.",
               error: true,
             });
             /* eslint-disable no-console */
@@ -199,7 +277,7 @@ export default {
       if (!exercicio.testeBuscado) {
         axios
           .get(`${backend.uri}/exercicio/${exercicio._id}/testes`)
-          .then(res => {
+          .then((res) => {
             exercicio.testes = res.data.data.testes;
             exercicio.testeBuscado = true;
             this.$forceUpdate();
@@ -208,26 +286,38 @@ export default {
     },
     buscarResolucao(exercicio) {
       if (!exercicio.resolucaoBuscada)
-        axios.get(`${backend.uri}/resolucao/${exercicio._id}`).then(res => {
+        axios.get(`${backend.uri}/resolucao/${exercicio._id}`).then((res) => {
           exercicio.resolucao = res.data.data.resolucao;
           exercicio.resolucaoBuscada = true;
           this.$forceUpdate();
         });
-    }
+    },
+    onVisualizarResolucao(exercicio) {
+      this.$modal.show("visualizar-exercicio", { exercicio });
+    },
+  },
+  computed: {
+    exercicios() {
+      const materiaId = this.$route.params.id;
+
+      return this.$store.getters["aluno/obterExerciciosMateria"](materiaId);
+    },
   },
   created() {
     axios
       .get(`${backend.uri}/materia/${this.$route.params.id}/show`)
-      .then(res => {
+      .then((res) => {
         this.materia = res.data.data;
         this.carregando = false;
       });
-    axios
-      .get(`${backend.uri}/exercicio/show/${this.$route.params.id}`)
-      .then(res => {
-        this.exercicios = res.data.data.exercicios;
-      });
-  }
+    // axios
+    //   .get(`${backend.uri}/exercicio/show/${this.$route.params.id}`)
+    //   .then(res => {
+    //     this.exercicios = res.data.data.exercicios;
+    //   });
+    const materiaId = this.$route.params.id;
+    this.$store.dispatch("aluno/obterExerciciosMateria", materiaId);
+  },
 };
 </script>
 <style>

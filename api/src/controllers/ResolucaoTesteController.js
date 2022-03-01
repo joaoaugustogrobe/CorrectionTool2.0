@@ -18,13 +18,13 @@ module.exports = {
 
   //professor obter notas de determinada resolução
   async obterNotasResolucao(req, res) {
-    const { user } = req.body;
+    const { user, role } = req.body;
     const { resolucaoId } = req.params;
 
     try {
       const permissao = await user.can("resolucao/obter", { resolucaoId });
       if (!permissao) throw "Permissão insuficiente";
-
+      console.log('obtendo testes')
       let testes = await TesteResolucao.aggregate([
         { $match: { 'resolucao': ObjectId(resolucaoId) } },
         { $sort: { 'updatedAt': 1 } },
@@ -47,6 +47,14 @@ module.exports = {
         },
         { $project: { teste: 0 } }
       ]);
+
+      testes = testes.map(teste => {
+        return {
+          ...teste,
+          output: role === 'aluno' ? '' : teste.output,
+          input: role === 'aluno' && teste.isPrivate ? teste.input.map(() => '???') : teste.input,
+        };
+      });
 
 
       if (!testes) {
@@ -78,7 +86,6 @@ module.exports = {
 
     try {
       const permissao = await user.can("exercicio/obter", { exercicioId });
-      console.log(permissao)
       if (!permissao) throw "Permissão insuficiente";
 
       const exercicio = await Exercicio.findById(exercicioId);
@@ -180,8 +187,6 @@ module.exports = {
           }
         ]
       );
-
-      console.log(resolucoes)
 
       // let notas = [{
       //   aluno: {},

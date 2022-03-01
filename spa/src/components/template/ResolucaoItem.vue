@@ -64,11 +64,9 @@
       </v-card>
     </v-dialog>
 
-    <StepperResolucaoItem :submissao="submissao"/>
+    <StepperResolucaoItem :submissao="submissao" />
 
     <div class="avaliacao px-3 mt-4">
-      
-      
       <div class="d-flex justify-space-between">
         <span>Resolução do aluno</span>
         <small>{{ resolucaoNota }}%</small>
@@ -77,22 +75,29 @@
         v-model="resolucaoNota"
         :thumb-color="resolucaoNotaCor"
         thumb-label
+        :disabled="isAluno"
         @change="onResolucaoNotaAlterado"
       >
       </v-slider>
     </div>
 
-    <v-card-actions>
-      <v-btn :disabled="!anteriorExiste" @click="$emit('anterior')">Anterior</v-btn>
-      <v-btn :disabled="!proximoExiste" @click="$emit('proximo')">Proximo</v-btn>
+    <v-card-actions v-if="isProfessor">
+      <v-btn :disabled="!anteriorExiste" @click="$emit('anterior')"
+        >Anterior</v-btn
+      >
+      <v-btn :disabled="!proximoExiste" @click="$emit('proximo')"
+        >Proximo</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
-import StepperResolucaoItem from '../comum/StepperResolucaoItem';
+import StepperResolucaoItem from "../comum/StepperResolucaoItem";
 
 import { butify } from "../../util/beautifier";
+import { mapGetters } from "vuex";
+
 export default {
   props: {
     submissao: {
@@ -127,8 +132,11 @@ export default {
     this.obterDadosExecucao();
   },
   computed: {
+    ...mapGetters("core", ["user", "isProfessor", "isAluno"]),
+    ...mapGetters("aluno", ["obterResolucao"]),
+    ...mapGetters("comum", ["obterComentarios"]),
     comentarios() {
-      return this.$store.getters["comum/comentarios"](this.submissao._id);
+      return this.obterComentarios(this.submissao._id);
     },
     correcao() {
       return this.$store.getters["comum/correcao"](this.submissao._id);
@@ -149,14 +157,20 @@ export default {
     resolucaoNotaCor() {
       return this.resolucaoNota >= 60 ? "blue" : "red";
     },
+    loading() {
+      return (
+        this.$store.state.loading["professor/downloadSubmissao"] ||
+        this.$store.state.loading["comum/downloadFeedback"]
+      );
+    },
   },
   watch: {
     correcao: {
       deep: true,
-      handler(correcao){
+      handler(correcao) {
         this.resolucaoNota = correcao.notaCorrecao;
-      }
-    }
+      },
+    },
   },
   methods: {
     async onResolucaoNotaAlterado(e) {
@@ -193,10 +207,7 @@ export default {
       }
     },
     async baixarFeedback() {
-      await this.$store.dispatch(
-        "comum/downloadFeedback",
-        this.submissao._id
-      );
+      await this.$store.dispatch("comum/downloadFeedback", this.submissao._id);
     },
     obterDadosExecucao() {
       this.$store.dispatch("professor/obterDadosExecucao", this.submissao._id);

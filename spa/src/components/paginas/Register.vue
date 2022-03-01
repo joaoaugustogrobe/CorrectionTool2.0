@@ -111,6 +111,7 @@ export default {
             content: "Bem vindo!",
             error: false
           });
+          this.$store.commit("core/set", {user: authUser});
         })
         .catch(e => {
           /* eslint-disable no-console */

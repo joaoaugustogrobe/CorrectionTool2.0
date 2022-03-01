@@ -49,7 +49,7 @@ export default {
     deletarTesteExercicio: (state, { testeId, exercicioId }) => {
       let testes = state.testes[exercicioId];
       const testeIndex = _.findIndex(testes, { _id: testeId });
-      if(testeIndex >= 0){
+      if (testeIndex >= 0) {
         Vue.delete(state.testes[exercicioId], testeIndex);
       }
     },
@@ -217,12 +217,12 @@ export default {
 
       context.dispatch('obterAlunosMateria', materia._id);
     },
-    async criarExercicio(context, payload){
+    async criarExercicio(context, payload) {
       const req = await context.state.client.post('exercicio/create', payload);
 
       if (req.ok) {
         context.commit('criarExercicio', req.data.data.exercicio);
-        
+
         context.commit("core/showMessage", {
           content: "Exercício criado com sucesso!",
           error: false,
@@ -305,7 +305,7 @@ export default {
 
     async salvarTeste(context, payload) {
 
-      const req = await context.state.client.post('testes/salvar', { ...payload, testeId: payload._id, exercicioId: payload.exercicio});
+      const req = await context.state.client.post('testes/salvar', { ...payload, testeId: payload._id, exercicioId: payload.exercicio });
 
       if (req.ok) {
         context.commit('salvarTesteExercicio', {
@@ -344,7 +344,7 @@ export default {
       }
     },
 
-    async deletarTeste(context, {testeId, exercicioId}) {
+    async deletarTeste(context, { testeId, exercicioId }) {
       const req = await context.state.client.post('testes/deletar', { testeId });
 
       if (req.ok) {
@@ -362,6 +362,25 @@ export default {
           error: true
         }, { root: true });
       }
+    },
+
+    async atualizarTesteResolucao(context, testeResolucao) {
+      const req = await context.state.client.post('testeresolucao/salvar', {testeResolucaoId: testeResolucao._id, isError: testeResolucao.isError});
+
+      if (req.ok) {
+        context.dispatch('obterDadosExecucao', req.data.data.testeResolucao.resolucao)
+        context.commit("core/showMessage", {
+          content: "Dados atualizados com sucesso!",
+          error: false,
+        }, { root: true });
+      } else {
+        context.commit("core/showMessage", {
+          content: "Falha ao salvar dados!",
+          error: true
+        }, { root: true });
+      }
+
+      return req;
     }
   },
   getters: {

@@ -30,6 +30,10 @@ const resolucaoTesteSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    hadError: {
+        type: Boolean,
+        default: false,
+    },
     versao: {
         type: Number,
         default: 0,

@@ -16,7 +16,7 @@
           </v-col>
           <v-col class="py-0" md="3" sm="6" cols="12">
             <div class="caption grey--text">Professor</div>
-            <div class="subtitle-1 black--text">{{materia.professor}}</div>
+            <div class="subtitle-1 black--text">{{materia.professor.nome}}</div>
           </v-col>
           <v-col class="py-0" md="2" sm="12" cols="4">
             <div class="caption grey--text">Capacidade</div>

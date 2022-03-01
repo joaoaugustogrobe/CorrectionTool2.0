@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import CorrectionTool from '../../../CorrectionTool/client.js';
+import _ from 'lodash';
 
 
 export default {
@@ -7,6 +8,8 @@ export default {
 	state: {
 		client: new CorrectionTool(),
 		feedbackResolucao: {},
+		exercicios: {},
+		resolucoes: {},
 	},
 	mutations: {
 		set: (state, payload) => {
@@ -24,6 +27,16 @@ export default {
 
 			Vue.set(state.feedbackResolucao[resolucaoId].comentarios, linha, { ...state.feedbackResolucao[resolucaoId][linha], comentario });
 		},
+		guardarExerciciosMateria: (state, payload) => {
+			const {materiaId, exercicios} = payload;
+
+			Vue.set(state.exercicios, materiaId, exercicios);
+		},
+		guardarResolucao: (state, payload) => {
+			const {exercicioId, resolucao} = payload;
+
+			Vue.set(state.resolucoes, exercicioId, resolucao);
+		}
 	},
 	actions: {
 		async downloadFeedback(context, resolucaoId) {
@@ -54,14 +67,58 @@ export default {
 			document.body.appendChild(element);
 			element.click();
 			document.body.removeChild(element);
+		},
+
+		async obterExerciciosMateria(context, materiaId) {
+			const req = await context.state.client.get(`exercicio/show/${materiaId}`);
+
+			if (req.ok) {
+				context.commit('guardarExerciciosMateria', {
+					materiaId,
+					exercicios: req.data.exercicios
+				});
+			} else {
+				context.commit("core/showMessage", {
+					content: "Falha ao obter exercícios da matéria!",
+					error: true
+				}, { root: true });
+			}
+		},
+
+		async obterResolucao(context, exercicioId){
+			const req = await context.state.client.get(`resolucao/${exercicioId}`);
+
+			if (req.ok) {
+				context.commit('guardarResolucao', {
+					exercicioId,
+					resolucao: req.data.resolucao
+				});
+			} else {
+				context.commit("core/showMessage", {
+					content: "Falha ao obter resolução!",
+					error: true
+				}, { root: true });
+			}
 		}
 	},
 	getters: {
-		obterComentarios: state => resolucaoId => {
+		comentarios: state => resolucaoId => {
 			return state.feedbackResolucao[resolucaoId] && state.feedbackResolucao[resolucaoId].comentarios || {};
 		},
 		correcao: state => resolucaoId => {
 			return state.feedbackResolucao[resolucaoId] && state.feedbackResolucao[resolucaoId].correcao || {};
+		},
+		obterExerciciosMateria: state => materiaId => {
+			return state.exercicios[materiaId] || [];
+		},
+		obterExercicio: (state, getters) => ({materiaId, exercicioId}) => {
+			const exercicios = getters['obterExerciciosMateria'](materiaId);
+			const index = _.findIndex(exercicios, {_id: exercicioId});
+			if(index > -1) return state.exercicios[materiaId][index];
+			return {};
+		},
+		obterResolucao: (state) => (exercicioId) => {
+			return state.resolucoes[exercicioId] || {};
 		},
 	}
 };

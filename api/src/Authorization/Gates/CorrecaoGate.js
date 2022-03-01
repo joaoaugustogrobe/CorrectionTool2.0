@@ -19,6 +19,7 @@ async function obter({userId, resolucaoId}){
     if(!resolucao) return false
 
     if(userId == resolucao.materia.professor) return true;
+    if(userId == resolucao.aluno) return true;
     return false;
 }
 

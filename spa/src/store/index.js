@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 // Modules
 import professor from './modulos/professor.js';
+import aluno from './modulos/aluno.js';
 import loading from './modulos/loading.js';
 import comum from './modulos/comum.js';
 import core from './modulos/core.js';
@@ -15,6 +16,7 @@ const store = new Vuex.Store({
   modules: {
     loading,
     professor,
+    aluno,
     comum,
     core,
   },

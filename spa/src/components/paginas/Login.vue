@@ -90,6 +90,7 @@ export default {
             content: "Login efetuado com sucesso!",
             error: false
           });
+          this.$store.commit("core/set", {user: authUser});
           if (this.role == "professor") this.$router.push("exercicios");
           else this.$router.push("aluno");
         })

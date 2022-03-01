@@ -42,7 +42,10 @@ export default {
       if (!token) this.autenticado = "convidado";
       else {
         this.user = JSON.parse(window.localStorage.getItem("user"));
-        if (this.user) this.autenticado = this.user.role;
+        if (this.user) {
+          this.autenticado = this.user.role
+          this.$store.commit("core/set", {user: this.user});
+        }
         else this.autenticado == "convidado";
       }
     },

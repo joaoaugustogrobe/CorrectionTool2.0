@@ -2,6 +2,7 @@ const { body } = require('express-validator');
 
 const Exercicio = require('../models/Exercicio');
 const Teste = require('../models/Teste');
+const TesteResolucao = require('../models/TesteResolucao');
 
 let schemas = {};
 
@@ -177,7 +178,7 @@ schemas['POST/testes/salvar'] = {
 		custom: {
 			options: async (value, { req, location, path }) => {
 				return Teste.findById(req.body.testeId).populate('exercicio').then(teste => {
-					if (!teste) 
+					if (!teste)
 						return Promise.reject('Teste não existe');
 
 					console.log("TESTE", teste);
@@ -238,7 +239,7 @@ schemas['POST/testes/create'] = {
 		custom: {
 			options: async (value, { req, location, path }) => {
 				return Exercicio.findById(req.body.exercicioId).then(exercicio => {
-					if (!exercicio) 
+					if (!exercicio)
 						return Promise.reject('Exercicio não existe');
 
 					console.log("Validando input:", req.body.exercicioId, exercicio)
@@ -269,6 +270,26 @@ schemas['POST/testes/deletar'] = {
 			},
 		},
 	},
+};
+
+schemas['POST/testeResolucao/salvar'] = {
+	testeResolucaoId: {
+		custom: {
+			options: async (value, { req, location, path }) => {
+				return TesteResolucao.findById(value).then(teste => {
+					if (!teste) {
+						return Promise.reject('TesteResolucao não existe');
+					}
+				});
+			},
+		},
+	},
+	isError: {
+		isBoolean: {
+			errorMessage: 'isError inválido',
+		},
+		toBoolean: true,
+	}
 };
 
 module.exports = schemas;

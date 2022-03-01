@@ -27,7 +27,7 @@
         :step="index"
         :key="index"
       >
-        <v-card class="mb-12 p-2" color="grey lighten-3">
+        <v-card class="pb-12">
           <div class="px-4 py-4">
             <v-form>
               <v-row v-for="(input, index) in resolucao.input" :key="index">
@@ -46,6 +46,7 @@
                 <v-col>
                   <v-textarea
                     label="Output do teste"
+                    v-if="isProfessor"
                     :value="resolucao.output"
                     readonly
                     outlined
@@ -65,6 +66,18 @@
                   />
                 </v-col>
               </v-row>
+              <v-row class="float-right">
+                <v-col>
+                  <a
+                    @click="onMudarEstadoResolucao(resolucao)"
+                    v-if="resolucao.testeresolucao.isError"
+                    >Clique aqui se essa solução estiver correta</a
+                  >
+                  <a @click="onMudarEstadoResolucao(resolucao)" v-else
+                    >Clique aqui se essa solução estiver incorreta</a
+                  >
+                </v-col>
+              </v-row>
             </v-form>
           </div>
         </v-card>
@@ -75,7 +88,13 @@
 
 <script>
 import { parseOutput } from "../../util/parser.js";
+import ConfiguracaoItem from "../configuracao/Item.vue";
+import {mapGetters} from 'vuex';
+
 export default {
+  components: {
+    ConfiguracaoItem,
+  },
   data() {
     return {
       testeIndex: -1,
@@ -84,17 +103,32 @@ export default {
   props: {
     submissao: {
       type: Object,
-      required: true,
+      default: () => {
+        return {
+          testeresolucao: { isError: false },
+        };
+      },
     },
   },
   computed: {
+    ...mapGetters('core', ['user', 'isProfessor', 'isAluno']),
     resolucaoTestes() {
-      return this.$store.state.professor.resolucaoTeste[this.submissao._id];
+      return (
+        this.$store.state.professor.resolucaoTeste[this.submissao._id] || []
+      );
+    },
+    loading() {
+      return false;
     },
   },
   methods: {
     onCopy() {},
+    onSalvar() {},
     parseOutput,
+    async onMudarEstadoResolucao(resolucao) {
+      const req = await this.$store.dispatch('professor/atualizarTesteResolucao', {...resolucao.testeresolucao, isError: !resolucao.testeresolucao.isError});
+      if(req.ok) this.testeIndex = -1;
+    },
   },
 };
 </script>

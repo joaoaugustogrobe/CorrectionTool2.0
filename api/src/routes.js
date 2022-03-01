@@ -19,6 +19,7 @@ const TesteController = require('./controllers/TesteController');
 const DockerController = require('./controllers/DockerController');
 const ResolucaoTesteController = require('./controllers/ResolucaoTesteController');
 const CorrecaoController = require('./controllers/CorrecaoController');
+const TesteResolucaoController = require('./controllers/TesteResolucaoController');
 
 const routes = express.Router();
 const upload = multer(uploadConfig);
@@ -63,16 +64,16 @@ routes.post('/testes/salvar', (req, res, next) => SessionController.validar(req,
 routes.post('/testes/deletar', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/testes/deletar']), TesteController.deletar);
 
 //ResolucaoTeste
-routes.get('/resolucao/testes/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), ResolucaoTesteController.obterNotasResolucao);
+routes.get('/resolucao/testes/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next), ResolucaoTesteController.obterNotasResolucao);
 
 //Correcao
 routes.post('/correcao/linefeedback/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), CorrecaoController.salvarFeedbackLinha);
 routes.post('/correcao/feedback/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), CorrecaoController.salvarFeedback);
-routes.get('/correcao/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), CorrecaoController.obterCorrecao);
+routes.get('/correcao/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next), CorrecaoController.obterCorrecao);
 
 routes.post('/correcao/create/:resolucaoId', (req, res, next) => SessionController.validar(req, res, next, "professor"), CorrecaoController.store);
 
-
+routes.post('/testeresolucao/salvar', (req, res, next) => SessionController.validar(req, res, next, "professor"), checkSchema(schemas['POST/testeResolucao/salvar']), TesteResolucaoController.salvarEstadoErro);
 
 
 routes.post('/docker', DockerController.containerCallback);
