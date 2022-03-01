@@ -1,12 +1,12 @@
 const Resolucao = require("../models/Resolucao");
 const Exercicio = require("../models/Exercicio");
 const Teste = require("../models/Teste");
-const FileUploadController = require("./FileUploadController");
 const FileController = require("./FileController")
 const DockerController = require("../controllers/DockerController")
 const MQProducer = require('../kafkaproducer');
 const { ObjectId } = require('mongodb');
 
+const Storage = require('../services/Storage');
 
 const fs = require("fs");
 const path = require("path");
@@ -19,11 +19,21 @@ module.exports = {
     try {
       if (!req.file) throw "É necessario fazer o upload de um arquivo.";
       const { filename, originalname } = req.file;
-      console.log("exercicioId", exercicioId);
+
       exercicio = await Exercicio.findById(exercicioId).populate('materia');
-      console.log(exercicio);
       if (!exercicio) throw "Exercício inexistente.";
       if (!exercicio.status) throw "Matéria desabilitada";
+
+      const tempPath = path.resolve(req.file.destination);
+
+      const pathDefinitivo = Storage.gerarDiretorio(
+        exercicio.materia._id,
+        exercicio._id,
+        userId
+      );
+
+      Storage.mover(tempPath, pathDefinitivo, filename, originalname);
+
 
       // prazoDiff = Date.now() - exercicio.prazo;
       // if (prazoDiff > 0) throw "Submissão atrasada.";
@@ -35,13 +45,6 @@ module.exports = {
         exercicio: exercicioId,
       });
 
-      let tempPath, definitivoPath;
-      tempPath = path.resolve(req.file.destination, filename);
-      definitivoPath = FileUploadController.gerarDiretorio(
-        exercicio.materia,
-        exercicio._id,
-        userId
-      );
       if (resolucao) {
         resolucao.tentativas++;
         resolucao.dataSubmissao = Date.now();
@@ -61,15 +64,14 @@ module.exports = {
         exercicio.submissoesCount++;
         await exercicio.save()
       }
-      console.log(tempPath, definitivoPath)
-      FileUploadController.rename(tempPath, definitivoPath, originalname);
-      console.log("Submetido! gerando execução")
-      let correcao = await prepararCorrecao(resolucao)
+
+      prepararCorrecao(resolucao);
+
     } catch (e) {
       if (req.file)
-        fs.unlink(req.file.path, e => {
-          console.log(e);
-        });
+      Storage.deletarArquivo(path.resolve(tempPath, filename));
+      Storage.deletarArquivo(path.resolve(pathDefinitivo, originalname));
+
       return res.status(400).send({ status: "error", message: e, data: null });
     }
 
@@ -214,7 +216,7 @@ module.exports = {
           throw "Resolução não pertence a um exercício desse professor.";
       }
 
-      filePath = FileUploadController.gerarDiretorio(
+      filePath = Storage.gerarDiretorio(
         resolucao.exercicio.materia._id,
         resolucao.exercicio._id,
         resolucao.aluno

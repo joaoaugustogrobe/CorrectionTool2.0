@@ -141,13 +141,46 @@
                 <v-col>
                   <v-alert
                     dense
+                    type="secondary"
+                    @click="() => onVisualizarResolucao(exercicio)"
+                    v-if="
+                      exercicio &&
+                      exercicio.resolucao &&
+                      exercicio.resolucao.status === 'pendente'
+                    "
+                  >
+                    <strong>{{ exercicio.resolucao.resolucaoFilename }}</strong>
+                    adicionado a fila de execução.
+                  </v-alert>
+                  <v-alert
+                    dense
                     type="success"
                     @click="() => onVisualizarResolucao(exercicio)"
-                    v-if="exercicio && exercicio.resolucao"
+                    v-else-if="
+                      exercicio &&
+                      exercicio.resolucao &&
+                      exercicio.resolucao.status === 'ok' &&
+                      exercicio.resolucao.corrigido
+                    "
                   >
                     Correção para
                     <strong>{{ exercicio.resolucao.resolucaoFilename }}</strong>
                     esta pronta.
+                  </v-alert>
+                  <v-alert
+                    dense
+                    type="success"
+                    @click="() => onVisualizarResolucao(exercicio)"
+                    v-else-if="
+                      exercicio &&
+                      exercicio.resolucao &&
+                      exercicio.resolucao.status === 'ok' &&
+                      !exercicio.resolucao.corrigido
+                    "
+                  >
+                    Detalhes sobre a execução de
+                    <strong>{{ exercicio.resolucao.resolucaoFilename }}</strong>
+                    estão disponiveis.
                   </v-alert>
                 </v-col>
               </v-row>

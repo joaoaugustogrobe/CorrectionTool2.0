@@ -60,7 +60,10 @@
                       />
                     </v-col>
                   </v-row>
-                  <v-row v-for="(assinaturaArg, index) in exercicio.assinatura" :key="index">
+                  <v-row
+                    v-for="(assinaturaArg, index) in exercicio.assinatura"
+                    :key="index"
+                  >
                     <v-col>
                       <ConfiguracaoItem :label="assinaturaArg">
                         <v-text-field
@@ -69,7 +72,9 @@
                           outlined
                           append-icon="mdi-content-copy"
                           :rules="[rules.required]"
-                          @input="(e) => onAtualizarInput(formTeste.input[index], e)"
+                          @input="
+                            (e) => onAtualizarInput(formTeste.input[index], e)
+                          "
                           @click:append="() => onCopy(formTeste.input[index])"
                         />
                       </ConfiguracaoItem>
@@ -95,7 +100,7 @@
 
             <v-stepper-content step="+">
               <div class="px-4 py-4">
-                <v-form v-if="testeIndex !== -1" ref="form">
+                <v-form v-if="testeIndex !== -1" ref="formCriacao">
                   <v-row>
                     <v-col cols="12" class="mb-4">
                       <ConfiguracaoItem
@@ -104,7 +109,6 @@
                         descricao="Testes privados exibirão inputs e outputs para alunos"
                         has-switch
                         :loading="loading"
-                        @input="onSalvar"
                       />
                     </v-col>
                     <v-col cols="12">
@@ -125,9 +129,15 @@
                       />
                     </v-col>
                   </v-row>
-                  <v-row v-for="(assinaturaArg, index) in exercicio.assinatura" :key="index">
+                  <v-row
+                    v-for="(assinaturaArg, index) in exercicio.assinatura"
+                    :key="index"
+                  >
                     <v-col>
-                      <ConfiguracaoItem :label="`Input ${index + 1}`" :descricao="assinaturaArg">
+                      <ConfiguracaoItem
+                        :label="`Input ${index + 1}`"
+                        :descricao="assinaturaArg"
+                      >
                         <v-text-field
                           :value="formTeste.input[index]"
                           dense
@@ -168,11 +178,7 @@
         @click="onSalvar"
         >Salvar</v-btn
       >
-      <v-btn
-        v-if="!loading"
-        class="mx-2"
-        color="red"
-        @click="onDeletar"
+      <v-btn v-if="!loading" class="mx-2" color="red" @click="onDeletar"
         >Deletar</v-btn
       >
       <v-btn
@@ -241,7 +247,8 @@ export default {
     },
     testeAlterado() {
       if (this.testeIndex === -1) return false;
-      if(this.isCriandoTeste) return !_.isEqual(this.formVazio, this.formTeste);
+      if (this.isCriandoTeste)
+        return !_.isEqual(this.formVazio, this.formTeste);
       else return !_.isEqual(this.testes[this.testeIndex], this.formTeste);
     },
     formVazio() {
@@ -256,7 +263,7 @@ export default {
       };
     },
     isCriandoTeste() {
-      return this.testeIndex === '+';
+      return this.testeIndex === "+";
     },
   },
   methods: {
@@ -267,25 +274,28 @@ export default {
       this.resetarForm();
     },
     onDeletar() {
-      this.$store.dispatch("professor/deletarTeste", {testeId: this.formTeste._id, exercicioId: this.exercicio._id});
-      if(this.testes.length) this.testeIndex = 0;
-      else this.testeIndex = '+';
+      this.$store.dispatch("professor/deletarTeste", {
+        testeId: this.formTeste._id,
+        exercicioId: this.exercicio._id,
+      });
+      if (this.testes.length) this.testeIndex = 0;
+      else this.testeIndex = "+";
     },
     resetarForm() {
-      this.$nextTick(()=>{
-        if(this.$refs.form[0])
-          this.$refs.form[0].resetValidation();
-        else if(this.$refs.form && this.$refs.form.resetValidation)
-          this.$refs.form.resetValidation();
+      this.$nextTick(() => {
+        if (this.$refs.form[0]) this.$refs.form[0].resetValidation();
+        else if (this.$refs.formCriacao && this.$refs.formCriacao.resetValidation)
+          this.$refs.formCriacao.resetValidation();
       });
 
       if (this.testeIndex === -1) return;
-      if (!this.testes[this.testeIndex]) this.testeIndex = '+';
-      if(this.isCriandoTeste) {
+      if (!this.testes[this.testeIndex]) this.testeIndex = "+";
+      if (this.isCriandoTeste) {
         this.formTeste = _.cloneDeep(this.formVazio);
-        this.formTeste.input = new Array(this.exercicio.assinatura && this.exercicio.assinatura.length).fill('');
-      }
-      else this.formTeste = _.cloneDeep(this.testes[this.testeIndex]);
+        this.formTeste.input = new Array(
+          this.exercicio.assinatura && this.exercicio.assinatura.length
+        ).fill("");
+      } else this.formTeste = _.cloneDeep(this.testes[this.testeIndex]);
     },
     onCopy(e) {
       navigator.clipboard.writeText(e);
@@ -295,8 +305,11 @@ export default {
       });
     },
     onCriar() {
-      if(this.validarForm())
-        this.$store.dispatch("professor/criarTeste", {...this.formTeste, exercicioId: this.exercicio._id});
+      if (this.validarForm())
+        this.$store.dispatch("professor/criarTeste", {
+          ...this.formTeste,
+          exercicioId: this.exercicio._id,
+        });
     },
     onAdicionarNovoInput() {
       if (this.novoInput) {
@@ -308,8 +321,11 @@ export default {
       this.formTeste.input.splice(index, 1, input);
     },
     validarForm() {
-      return this.$refs.form.validate();
-    }
+      if (this.$refs.form[0]) return this.$refs.form[0].validate();
+      else if (this.$refs.formCriacao && this.$refs.formCriacao.validate)
+        return this.$refs.formCriacao.validate();
+      return false;
+    },
   },
   watch: {
     testeIndex: {
@@ -332,14 +348,14 @@ export default {
 .col {
   padding: 0 12px;
 }
-::v-deep .v-stepper__header{
+::v-deep .v-stepper__header {
   flex-wrap: nowrap;
   overflow-x: scroll;
 }
-::v-deep .v-stepper__step{
+::v-deep .v-stepper__step {
   flex-shrink: 0;
 }
-::v-deep .v-divider{
+::v-deep .v-divider {
   min-width: 30px;
 }
 </style>

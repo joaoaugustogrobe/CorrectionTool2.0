@@ -18,7 +18,7 @@ module.exports = {
         throw "Senha incorreta";
       if (!materia.status)
         throw "Matéria desabilitada";
-      if (materia.capacidade >= materia.lotacao)
+      if (materia.capacidade <= materia.lotacao)
         throw "Matéria cheia";
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null })

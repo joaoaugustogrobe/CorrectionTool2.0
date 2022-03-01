@@ -46,7 +46,6 @@ module.exports = {
         correcao.notaCorrecao = nota;
         await correcao.save();
       } else {
-        const resolucao = await Resolucao.findById(resolucaoId);
         const exercicio = resolucao.exercicio;
         const aluno = resolucao.aluno;
 
@@ -57,6 +56,11 @@ module.exports = {
           exercicio,
         });
       }
+
+      let resolucao = await Resolucao.findById(resolucaoId);
+      
+      resolucao.corrigido = true;
+      await resolucao.save();
 
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null });

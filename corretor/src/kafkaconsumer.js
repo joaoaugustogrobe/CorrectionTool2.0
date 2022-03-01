@@ -14,6 +14,11 @@ class MQConsumer {
         this.dockerClient = new DockerClient();
         
         let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        connection.on('error', (err) => {
+            console.error(err);
+            this.channel = null;
+        });
+        
         this.channel = await connection.createChannel();
         await this.channel.assertQueue("lista-correcao");
 
