@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
-const md5 = require('md5')
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
-const alunoSchema = new mongoose.Schema({
+const adminSchema = new mongoose.Schema({
   email: {
     type: String,
     trim: true,
@@ -14,18 +13,6 @@ const alunoSchema = new mongoose.Schema({
     trim: true,
     required: true,
     select: false,
-  },
-  nome: {
-    type: String,
-    trim: true,
-    required: true
-  },
-  gravatarUrl: {
-    type: String,
-    required: false,
-    default: function () {
-      return md5(this.email)
-    }
   },
   salt: {
     type: String,
@@ -42,11 +29,11 @@ const alunoSchema = new mongoose.Schema({
   }
 });
 
-alunoSchema.pre('save', async function(next){
-  const hash = await bcrypt.hash(this.password, 10);
+adminSchema.pre('save', async function(next){
+  const hash = await bcrypt.hash(this.password + this.salt, 10);
   this.password = hash;
 
   next();
 });
 
-module.exports = mongoose.model('Aluno', alunoSchema);
+module.exports = mongoose.model('Admin', adminSchema);

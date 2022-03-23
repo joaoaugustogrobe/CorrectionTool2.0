@@ -1,7 +1,6 @@
 const Resolucao = require("../models/Resolucao");
 const Exercicio = require("../models/Exercicio");
 const Teste = require("../models/Teste");
-const FileUploadController = require("./FileUploadController");
 const FileController = require("./FileController")
 const DockerController = require("./DockerController")
 const TesteResolucao = require("../models/TesteResolucao");

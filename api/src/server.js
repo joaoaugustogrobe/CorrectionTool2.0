@@ -20,7 +20,7 @@ const server = http.Server(app);
 
 app.use(cors({
   credentials: true,
-  origin: process.env.CORS_ORIGIN_URI
+  origin: [process.env.CORS_ORIGIN_URI],
 }))
 app.use(cookieParser())
 app.use(express.json());
@@ -36,11 +36,14 @@ async function run(){
   console.log('[INFO] - Inicializando')
   await MQProducer.initializeConnection().catch(e => {
     console.error("[ERRO] Não foi possivel inicializar o servidor - Kafka offline", e);
-  })
-  console.log("[OK] Kafka conectado")
+  }).then(() => {
+    console.log("[OK] Kafka conectado")
+  });
 
   await MQConsumer.initializeConnection().catch(e => {
     console.error("[ERRO] Não foi possivel inicializar o servidor - Kafka offline - subscriber", e);
+  }).then(() => {
+    console.log("[OK] Kafka conectado")
   });
 
 

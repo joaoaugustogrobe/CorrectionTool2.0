@@ -2,7 +2,17 @@
 var amqp = require('amqplib');
 const DockerClient = require('./dockerController');
 const MQProducer = require('./kafkaproducer');
+require('dotenv').config()
 
+const amqpConfig = {
+    protocol: 'amqp',
+    vhost: '/',
+    authMechanism: ['PLAIN', 'AMQPLAIN', 'EXTERNAL'],
+    hostname: process.env.QUEUE_HOST,
+    username: process.env.QUEUE_USER,
+    password: process.env.QUEUE_PASSWORD,
+    port: process.env.QUEUE_PORT,
+}
 
 
 class MQConsumer {
@@ -10,10 +20,12 @@ class MQConsumer {
     static dockerClient;
 
 
-    static async initializeConnection(){
-        this.dockerClient = new DockerClient();
+    static async initializeConnection(client){
+        this.dockerClient = new DockerClient(client);
         
-        let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        // let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        let connection = await amqp.connect(amqpConfig);
+
         connection.on('error', (err) => {
             console.error(err);
             this.channel = null;

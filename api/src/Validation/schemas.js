@@ -2,6 +2,7 @@ const { body } = require('express-validator');
 
 const Exercicio = require('../models/Exercicio');
 const Teste = require('../models/Teste');
+const Aluno = require('../models/Aluno');
 const TesteResolucao = require('../models/TesteResolucao');
 
 let schemas = {};
@@ -167,6 +168,10 @@ schemas['POST/testes/salvar'] = {
 				return true;
 			},
 		},
+		isLength: {
+			errorMessage: 'Mensagem de erro deve conter ao menos 6 caracteres',
+			options: { min: 6 },
+		},
 	},
 	output: {
 		isLength: {
@@ -227,6 +232,10 @@ schemas['POST/testes/create'] = {
 				if (typeof (value) !== 'string') throw new Error('Mensagem de erro inválida');
 				return true;
 			},
+		},
+		isLength: {
+			errorMessage: 'Mensagem de erro deve conter ao menos 6 caracteres',
+			options: { min: 6 },
 		},
 	},
 	output: {
@@ -291,6 +300,72 @@ schemas['POST/testeResolucao/salvar'] = {
 		toBoolean: true,
 	}
 };
+
+schemas['POST/aluno/forgot_password'] = {
+	email: {
+		isEmail: {
+			errorMessage: "Email inválido",
+		},
+	}
+}
+
+schemas['POST/aluno/reset_password'] = {
+	alunoId: {
+		custom: {
+			options: async (value, { req, location, path }) => {
+				return Aluno.findById(value).then(aluno => {
+					if (!aluno) {
+						return Promise.reject('Aluno não existe');
+					}
+				});
+			},
+		},
+	},
+	token: {
+		isHexadecimal: {
+			errorMessage: "Token inválido",
+		},
+		isLength: {
+			errorMessage: "Token inválido",
+			options: {min: 40, max: 40}
+		}
+	},
+	password: {
+		isLength: {
+			errorMessage: "Password inválido",
+			options: {min: 6}
+		}
+	}
+}
+
+schemas['POST/admin/login'] = {
+	email: {
+		isEmail: {
+			errorMessage: "Email inválido",
+		},
+	},
+	password: {
+		isLength: {
+			errorMessage: "Password inválido",
+			options: {min: 12}
+		}
+	}
+}
+
+schemas['POST/admin/create'] = {
+	email: {
+		isEmail: {
+			errorMessage: "Email inválido",
+		},
+	},
+	password: {
+		isLength: {
+			errorMessage: "Password inválido",
+			options: {min: 12}
+		}
+	}
+}
+
 
 module.exports = schemas;
 

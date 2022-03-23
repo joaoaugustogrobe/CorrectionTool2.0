@@ -99,6 +99,40 @@ export default {
 					error: true
 				}, { root: true });
 			}
+		},
+
+		async forgotPassword(context, email){
+			const req = await context.state.client.post('aluno/forgot_password', {email});
+
+			if (req.ok) {
+				context.commit("core/showMessage", {
+					content: req.data.message,
+					error: false
+				}, { root: true });
+			} else {
+				context.commit("core/showMessage", {
+					content: "Falha ao redefinir senha!",
+					error: true
+				}, { root: true });
+			}
+			return req;
+		},
+
+		async resetPassword(context, payload){
+			const req = await context.state.client.post('aluno/reset_password', payload);
+
+			if (req.ok) {
+				context.commit("core/showMessage", {
+					content: req.data.message,
+					error: false
+				}, { root: true });
+			} else {
+				context.commit("core/showMessage", {
+					content: req.data.message,
+					error: true
+				}, { root: true });
+			}
+			return req;
 		}
 	},
 	getters: {

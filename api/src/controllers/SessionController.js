@@ -4,7 +4,9 @@ const Guard = require('../Authorization/Guard')
 require('dotenv').config()
 module.exports = {
     validar(req, res, next, type) {
-        jwt.verify(req.cookies['x-access-token'], process.env.JWT_KEY, function (err, decoded) {
+        const token = req.cookies['x-access-token'] ? req.cookies['x-access-token'] : (req.headers['authorization']||'').replace('Bearer ', '');
+        jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
+            // console.log(req.url, err ? 'ERROR' : 'OK');
             if (err)
                 return res.status(401).send({ status: "error", message: err.message, data: null })
             if (type && decoded.role != type)

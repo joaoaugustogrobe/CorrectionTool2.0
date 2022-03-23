@@ -268,7 +268,9 @@ export default {
   },
   methods: {
     onSalvar() {
-      this.$store.dispatch("professor/salvarTeste", this.formTeste);
+      const formValido = this.$refs?.form[0]?.validate();
+      if(formValido)
+        this.$store.dispatch("professor/salvarTeste", this.formTeste);
     },
     onCancelar() {
       this.resetarForm();
@@ -283,8 +285,9 @@ export default {
     },
     resetarForm() {
       this.$nextTick(() => {
-        if (this.$refs.form[0]) this.$refs.form[0].resetValidation();
-        else if (this.$refs.formCriacao && this.$refs.formCriacao.resetValidation)
+        if (this.$refs.form && this.$refs.form[0])
+          this.$refs.form[0].resetValidation();
+        if (this.$refs.formCriacao && this.$refs.formCriacao.resetValidation)
           this.$refs.formCriacao.resetValidation();
       });
 
@@ -304,12 +307,15 @@ export default {
         error: false,
       });
     },
-    onCriar() {
-      if (this.validarForm())
-        this.$store.dispatch("professor/criarTeste", {
+    async onCriar() {
+      const formValido = this.$refs.formCriacao.validate();
+      if (formValido) {
+        await this.$store.dispatch("professor/criarTeste", {
           ...this.formTeste,
           exercicioId: this.exercicio._id,
         });
+        this.testeIndex = this.testes.length - 1;
+      }
     },
     onAdicionarNovoInput() {
       if (this.novoInput) {
@@ -321,9 +327,8 @@ export default {
       this.formTeste.input.splice(index, 1, input);
     },
     validarForm() {
-      if (this.$refs.form[0]) return this.$refs.form[0].validate();
-      else if (this.$refs.formCriacao && this.$refs.formCriacao.validate)
-        return this.$refs.formCriacao.validate();
+      if (this.$refs.form && this.$refs.form[0])
+        return this.$refs.form[0].validate();
       return false;
     },
   },

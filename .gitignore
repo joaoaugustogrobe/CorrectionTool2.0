@@ -10,3 +10,7 @@ api/uploads/
 api/temp/
 
 api/dist/
+
+corretor/.env
+
+corretor/temp/

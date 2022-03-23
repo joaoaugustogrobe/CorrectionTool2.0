@@ -9,11 +9,24 @@ import AlunoMaterias from './components/paginas/aluno/Materias'
 import AlunoMatricula from './components/paginas/aluno/Matricula'
 import AlunoMateria from './components/paginas/aluno/Materia'
 import Register from './components/paginas/Register'
+import ForgotPassword from './components/paginas/ForgotPassword'
+import ResetPassword from './components/paginas/ResetPassword'
 Vue.use(Router)
 
 let router = new Router({
 
   routes: [
+    {
+      path: '/forgot_password',
+      name: 'Forgot password',
+      component: ForgotPassword,
+    },
+    {
+      path: '/reset_password',
+      name: 'Reset Password',
+      component: ResetPassword,
+      props: (route) => ({ token: route.query.token, id: route.query.id }),
+    },
     {
       path: '/materias',
       name: 'materias',
@@ -74,6 +87,8 @@ router.beforeEach((to, from, next) => {
   const requerProfessor = to.matched.some(record => record.meta.role == "professor")
   const requerAluno = to.matched.some(record => record.meta.role == "aluno")
   const user = JSON.parse(localStorage.getItem("user"))
+
+  console.log(user, requerAuth);
 
   if (requerAuth) {
     if(!user)

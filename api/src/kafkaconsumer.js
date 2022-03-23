@@ -1,10 +1,20 @@
 const { Kafka } = require("kafkajs");
 const ResolucaoController = require("./controllers/ResolucaoController");
 const ResolucaoTeste = require("./services/ResolucaoTeste");
+require('dotenv').config()
+
 
 var amqp = require('amqplib');
 
-
+const amqpConfig = {
+    protocol: 'amqp',
+    vhost: '/',
+    authMechanism: ['PLAIN', 'AMQPLAIN', 'EXTERNAL'],
+    hostname: process.env.QUEUE_HOST,
+    username: process.env.QUEUE_USER,
+    password: process.env.QUEUE_PASSWORD,
+    port: process.env.QUEUE_PORT,
+}
 
 
 const kafka = new Kafka({
@@ -20,7 +30,8 @@ class MQConsumer {
     static channel = null;
 
     static async initializeConnection(){
-        let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        // let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        let connection = await amqp.connect(amqpConfig);
         connection.on('error', (err) => {
             console.error(err);
             this.channel = null;

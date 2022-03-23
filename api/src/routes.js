@@ -10,6 +10,7 @@ const schemas = require('./Validation/schemas');
 
 const AlunoController = require('./controllers/AlunoController');
 const ProfessorController = require('./controllers/ProfessorController');
+const AdminController = require('./controllers/AdminController');
 const MateriaController = require('./controllers/MateriaController');
 const MatriculaController = require('./controllers/MatriculaController');
 const ExercicioController = require('./controllers/ExercicioController');
@@ -25,11 +26,18 @@ const routes = express.Router();
 const upload = multer(uploadConfig);
 
 //Professor
-routes.post('/professor/login', ProfessorController.authenticate)
+routes.post('/professor/login', ProfessorController.authenticate);
+
+//Admin
+routes.post('/admin/create', checkSchema(schemas['POST/admin/create']), AdminController.store);
+routes.post('/admin/login', checkSchema(schemas['POST/admin/login']), AdminController.authenticate);
 
 //Aluno
-routes.post('/aluno/login', AlunoController.authenticate)
-routes.post('/aluno/create', AlunoController.store)
+routes.post('/aluno/login', AlunoController.authenticate);
+routes.post('/aluno/create', AlunoController.store);
+
+routes.post('/aluno/forgot_password', checkSchema(schemas['POST/aluno/forgot_password']), AlunoController.esqueciMinhaSenha);
+routes.post('/aluno/reset_password', checkSchema(schemas['POST/aluno/reset_password']), AlunoController.redefinirSenha);
 
 //Materias
 routes.post('/materia/create', (req, res, next) => SessionController.validar(req, res, next, "professor"), MateriaController.store);

@@ -18,6 +18,7 @@ services:
     command: "vue ui -H 0.0.0.0 -p 8000"
 
   api:
+    container_name: 'api'
     build:
       context: "./env/dev/api"
     ports:
@@ -34,18 +35,21 @@ services:
     working_dir: /var/www
     command: "npm run dev"
     depends_on:
-      - kafka
+      - rabbitmq
     
 
   corretor:
     build:
       context: "./env/dev/corretor"
-    depends_on:
-      - kafka
+    # depends_on:
+      # - kafka
     volumes:
       - type: bind
         source: ./corretor
         target: /var/www
+      - type: bind
+        source: ./corretor/temp
+        target: /usr/local/Exercicios
     # working_dir: /var/www
     command: "npm run dev"
 
@@ -78,43 +82,38 @@ services:
       - mongo
 
 
-  zookeeper:
-    image: wurstmeister/zookeeper
-    ports:
-      - "${AIRSEND_ZOOKEEPER_PORT:-2181}:2181"
-
-  kafka:
-    image: wurstmeister/kafka
-    volumes:
-      - ./server/kafka:/stats
-#    ports:
-#      - target: 9094
-#        published: 9094
-#        protocol: tcp
-#        mode: host
-    #docker exec -it correctiontool20_kafka_1 kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic lista-correcao
-    #docker exec -it correctiontool20_kafka_1 kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic lista-correcao-resposta
+  mail:
+    image: bytemark/smtp
+    restart: always
     environment:
-      BROKER_ID: -1
-      HOSTNAME_COMMAND: ${HOSTNAME_COMMAND:-echo localhost}
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
-      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ADVERTISED_HOST_NAME: _{HOSTNAME_COMMAND}
-      KAFKA_ZOOKEEPER_CONNECT: ${AIRSEND_ZOOKEEPER_HOST:-zookeeper:2181}
-      KAFKA_NUM_PARTITIONS: ${KAFKA_NUM_PARTITIONS:-10} # for now we just ensure more partitions then consumers as default. That can be fine tunned.
-      KAFKA_DEFAULT_REPLICATION_FACTOR: ${KAFKA_DEFAULT_REPLICATION_FACTOR:-1}
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR:-1}
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS:-3000}
-      KAFKA_LOG_RETENTION_BYTES: 536870912
-      KAFKA_LOG_RETENTION_DAYS: 1
+      RELAY_HOST: smtp.joaocastilho.com.br
+      RELAY_PORT: 587
+      RELAY_USERNAME: noreply@joaocastilho.com.br
+      RELAY_PASSWORD: /lo@der.js:1085:14
 
 
-    restart: on-failure
-    links:
-      - zookeeper
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: user1234
+      RABBITMQ_DEFAULT_PASS: user1234
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    # networks:
+      # - rabbitmq_go_net
+
 
 volumes:
   mongodata:
   composer-volume:
+
+networks:
+  rabbitmq_go_net:
+    driver: bridge

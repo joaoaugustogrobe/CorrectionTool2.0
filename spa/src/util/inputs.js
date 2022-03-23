@@ -12,7 +12,8 @@ export const inputMixin = {
 					if (typeof (value) !== 'object' || !value.length) return 'Requer ao menos um argumento';
 					return true;
 				},
-
+				senhasIguais: (senha1, senha2) => senha1 === senha2 || "As senhas devem ser iguais.",
+				email: v => /.+@.+\..+/.test(v) || "E-mail inválido",
 			},
 		}
 	}

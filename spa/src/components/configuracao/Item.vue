@@ -1,9 +1,15 @@
 <template>
   <div>
-    <div class="configuracao-item-header" :class="{ textfield: textfield, descricao: descricao }">
+    <div
+      class="configuracao-item-header"
+      :class="{ textfield: textfield, descricao: descricao }"
+    >
       <label :for="id">{{ label }}</label>
     </div>
-    <div class="configuracao-item-body" :class="{ textfield: textfield, descricao: descricao }">
+    <div
+      class="configuracao-item-body"
+      :class="{ textfield: textfield, descricao: descricao }"
+    >
       <div class="configuracao-item-conteudo">
         <span class="configuracao-item-descricao" v-if="descricao">{{
           descricao
@@ -17,6 +23,7 @@
           :id="id"
           :value="value"
           :disabled="disabled"
+          :readonly="readonly"
           @input="(e) => $emit('input', e)"
           :rules="rules"
         />
@@ -29,6 +36,7 @@
         @change="(e) => $emit('input', !!e)"
         :value="value"
         :disabled="disabled"
+        :readonly="readonly"
       ></v-switch>
     </div>
   </div>
@@ -63,14 +71,18 @@ export default {
       type: Boolean,
       default: false,
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
     loading: {
       type: Boolean,
       default: false,
     },
     rules: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -89,7 +101,8 @@ export default {
     line-height: 17px;
     margin-bottom: 2px;
   }
-  &.textfield label, &.descricao label{
+  &.textfield label,
+  &.descricao label {
     margin-bottom: 0px;
   }
 }
@@ -109,7 +122,8 @@ export default {
       padding-right: 2rem;
     }
   }
-  &.textfield, &.descricao {
+  &.textfield,
+  &.descricao {
     margin-top: -2px;
   }
 }

@@ -7,6 +7,7 @@
         :submissao="submissao"
         :key="submissao._id"
         v-if="submissao && submissao._id"
+        :exercicio="exercicio"
         @proximo="proximaSubmissao"
         @anterior="submissaoAnterior"
         :proximoExiste="proximoExiste"

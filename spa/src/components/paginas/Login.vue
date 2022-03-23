@@ -38,6 +38,8 @@
                 <a v-if="role == 'professor'" @click="role = 'aluno'">Quero me logar como aluno</a>
                 <v-spacer></v-spacer>
                 <a @click="$router.push('register')">Não possui uma conta ? Registre-se!</a>
+                <v-spacer></v-spacer>
+                <a @click="$router.push('forgot_password')">Esqueci minha senha</a>
               </v-card-text>
               <v-card-actions>
                 <v-spacer />

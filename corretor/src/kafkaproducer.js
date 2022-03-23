@@ -1,11 +1,22 @@
 var amqp = require('amqplib');
+require('dotenv').config()
 
+const amqpConfig = {
+    protocol: 'amqp',
+    vhost: '/',
+    authMechanism: ['PLAIN', 'AMQPLAIN', 'EXTERNAL'],
+    hostname: process.env.QUEUE_HOST,
+    username: process.env.QUEUE_USER,
+    password: process.env.QUEUE_PASSWORD,
+    port: process.env.QUEUE_PORT,
+}
 
 class MQProducer {
     static channel = null;
     static async initializeConnection(){
-        // return producer.connect(); //return Promise
-        let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        // let connection = await amqp.connect('amqps://uwpafgqx:BEs1jYgp8RkBYu6JsE9V5LlN8DOa3TNY@porpoise.rmq.cloudamqp.com/uwpafgqx');
+        let connection = await amqp.connect(amqpConfig);
+
         connection.on('error', (err) => {
             console.error(err);
             this.channel = null;

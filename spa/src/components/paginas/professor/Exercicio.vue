@@ -1,20 +1,33 @@
 <template>
   <div class="exercicio">
     <v-container class="my-5">
-        <v-flex>
-          <card-exercicio
-            flat
-            class="px-2 my-3"
-            :exercicioNome="exercicio && exercicio.titulo"
-            :materiaNome="materia && materia.nome || ''"
-            :submissoes="exercicio && exercicio.submissoesCount"
-            :dataFinal="exercicio && exercicio.prazo"
-            :status="exercicio && exercicio.status"
-          />
-        </v-flex>
-        <v-container>
-          <span>{{ exercicio.descricao }}</span>
-        </v-container>
+      <v-flex>
+        <v-card>
+          <v-card-title
+            >{{ exercicio.titulo }} · {{ assinaturaFuncao }}</v-card-title
+          >
+          <v-card-subtitle
+            ><v-badge
+              inline
+              color="red"
+              dot
+              v-if="minutosAPartirDeHoje(exercicio.prazo) > 0"
+            />{{ displayData(exercicio.prazo) }} ·
+            {{ dataRelativa(exercicio.prazo) }}</v-card-subtitle
+          >
+          <v-card-text>
+            <v-row align="center" class="mx-0" v-if="!exercicio.visivel">
+              <v-badge inline color="red" dot></v-badge>
+              <span>Este exercício não esta visivel para alunos</span>
+            </v-row>
+            <v-row>
+              <span class="exercicio-descricao">{{ exercicio.descricao }}</span>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+      <v-container> </v-container>
+      <v-card>
         <v-flex>
           <v-stepper v-model="stepperAtivo">
             <v-stepper-header>
@@ -26,9 +39,12 @@
                   edit-icon="arrow_drop_down"
                   editable
                   @click="onAbrirTestes"
-                  >{{teste.nome}}</v-stepper-step
+                  >{{ teste.nome }}</v-stepper-step
                 >
-                <v-divider v-if="index !== testes.length" :key="index"></v-divider>
+                <v-divider
+                  v-if="index !== testes.length"
+                  :key="index"
+                ></v-divider>
               </template>
               <v-divider key="divider"></v-divider>
               <v-stepper-step
@@ -43,9 +59,11 @@
             </v-stepper-header>
           </v-stepper>
         </v-flex>
-        <div v-if="!carregando" class="mt-4">
-          <ListagemSubmissoes :submissoes="submissoes" />
-        </div>
+      </v-card>
+
+      <div v-if="!carregando" class="mt-4">
+        <ListagemSubmissoes :submissoes="submissoes" />
+      </div>
     </v-container>
     <v-btn class="amber accent-3" fixed bottom right fab @click="onEdit">
       <v-icon>edit</v-icon>
@@ -71,7 +89,7 @@ export default {
   computed: {
     ...mapGetters("professor", ["obterMateria", "obterTestes"]),
     materia() {
-      if(!this.exercicio.materia) return {};
+      if (!this.exercicio.materia) return {};
       return this.obterMateria(this.exercicio?.materia?._id);
     },
     submissoes() {
@@ -80,7 +98,7 @@ export default {
         this.materia._id
       );
     },
-    exercicioId(){
+    exercicioId() {
       return this.$route.params.id;
     },
     exercicio() {
@@ -88,6 +106,17 @@ export default {
     },
     testes() {
       return this.obterTestes(this.exercicioId);
+    },
+    assinaturaFuncao() {
+      const parametros = this.exercicio?.assinatura?.reduce(
+        (anterior, input) => {
+          return anterior ? `${anterior}, ${input}` : input;
+        },
+        ""
+      );
+
+      // const assinatura = `${this.exercicio.nomeFuncao}(${parametros})`;
+      return `${this.exercicio.nomeFuncao}(${parametros})`;
     },
   },
   data() {
@@ -111,7 +140,7 @@ export default {
   },
   methods: {
     onEdit() {
-      this.$modal.show("alterar-exercicio", {exercicio: this.exercicio});
+      this.$modal.show("alterar-exercicio", { exercicio: this.exercicio });
     },
     log(a) {
       /* eslint-disable no-console */
@@ -141,7 +170,7 @@ export default {
     async init() {
       const exercicioId = this.$route.params.id;
 
-      this.$store.dispatch('professor/obterTestesExercicio', {exercicioId});
+      this.$store.dispatch("professor/obterTestesExercicio", { exercicioId });
 
       await this.$store.dispatch("professor/obterSubmissoes", {
         exercicioId: exercicioId,
@@ -153,8 +182,11 @@ export default {
 
       this.carregando = false;
     },
-    onAbrirTestes(){
-      this.$modal.show('alterar-exercicio', {tab: 'testes', exercicio: this.exercicio});
+    onAbrirTestes() {
+      this.$modal.show("alterar-exercicio", {
+        tab: "testes",
+        exercicio: this.exercicio,
+      });
     },
   },
   mounted() {
@@ -164,4 +196,8 @@ export default {
 </script>
 
 <style>
+.exercicio-descricao{
+  padding: 1rem;
+  white-space: pre-wrap;
+}
 </style>

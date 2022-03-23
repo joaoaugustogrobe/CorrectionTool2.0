@@ -211,7 +211,7 @@ module.exports = {
       if (role == "aluno") {
         if (userId != resolucao.aluno)
           throw "Resolução não pertence a esse aluno.";
-      } else {
+      } else if(role == "professor"){
         if (userId != resolucao.exercicio.materia.professor)
           throw "Resolução não pertence a um exercício desse professor.";
       }
@@ -254,6 +254,7 @@ async function prepararCorrecao(resolucao) {
         teste: teste._id,
         nomeFuncao: teste.exercicio.nomeFuncao,
         versao: resolucao.tentativas,
+        ext: '.m',
       }));
     })
     // testes.forEach(teste => {
