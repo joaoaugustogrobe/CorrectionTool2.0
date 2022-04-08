@@ -2,7 +2,7 @@ const Aluno = require('../models/Aluno');
 const SessionController = require('./SessionController');
 const crypto = require('crypto');
 const Mailer = require('../services/Mailer');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const {mapErrors} = require('../Validation/index');
 

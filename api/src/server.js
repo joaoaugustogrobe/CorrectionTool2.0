@@ -33,33 +33,32 @@ run();
 async function run(){
   //kafka
   // const mq = new MQProducer();
-  console.log('[INFO] - Inicializando')
+  console.log('[INFO] - Inicializando');
+
+  console.log('[INFO] - Inicializando MQProducer');
   await MQProducer.initializeConnection().catch(e => {
     console.error("[ERRO] Não foi possivel inicializar o servidor - Kafka offline", e);
+    process.exit(1);
   }).then(() => {
-    console.log("[OK] Kafka conectado")
+    console.log("[OK] MQProducer conectado")
   });
 
+  console.log('[INFO] - Inicializando MQConsumer');
   await MQConsumer.initializeConnection().catch(e => {
     console.error("[ERRO] Não foi possivel inicializar o servidor - Kafka offline - subscriber", e);
+    process.exit(1);
   }).then(() => {
-    console.log("[OK] Kafka conectado")
+    console.log("[OK] MQConsumer conectado");
   });
 
-
-  // //banco de dados
-  // // await mongoose.connect(`mongodb+srv://root:root@cluster0.w6op8.mongodb.net/teste?retryWrites=true&w=majority`, {
-  // await mongoose.connect(`mongodb://root:example@localhost:27017/test?authSource=admin`).catch(e => {
-  //   console.error("[ERRO] Não foi possivel inicializar o servidor - Database offline", e);
-  // })
-  // console.log("[OK] Banco de dados conectado")
-  console.log(`mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`)
+  console.log(`[INFO] - Conectando em mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`)
   await mongoose.connect(`mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?authSource=admin`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  }).then(()=>console.log("Conectado ao banco de dados.")).catch(err => console.error(err))
-
-
+  }).then(()=>console.log("[OK] Conectado ao banco de dados.")).catch(e => {
+    console.error("[ERRO] Não foi possivel inicializar o servidor - Bando de dados offline", e);
+    process.exit(1);
+  })
 
 
   //servidor
@@ -71,7 +70,7 @@ async function run(){
     console.log("[ERRO] Não foi possivel inicializar o servidor - Porta pode estar em uso", e);
       setTimeout(() => {
         server.close();
-        server.listen(3333);
+        process.exit(1);
       }, 1000);
   });
 

@@ -1,5 +1,5 @@
 const Admin = require('../models/Admin');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const {mapErrors} = require('../Validation/index');
 const SessionController = require('./SessionController');
 

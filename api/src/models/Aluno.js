@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const md5 = require('md5')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 const alunoSchema = new mongoose.Schema({
