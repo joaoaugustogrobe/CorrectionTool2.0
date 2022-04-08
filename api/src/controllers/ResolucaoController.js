@@ -13,7 +13,7 @@ const path = require("path");
 
 module.exports = {
   async store(req, res) {
-    const { userId, exercicioId } = req.body;
+    const { userId, exercicioId, comentarios } = req.body;
     //Validação
     let resolucao, exercicio, prazoDiff, prazoString;
     try {
@@ -47,9 +47,11 @@ module.exports = {
 
       if (resolucao) {
         resolucao.tentativas++;
+        console.log('corrigindo resolucao, tentativas:', resolucao.tentativas);
         resolucao.dataSubmissao = Date.now();
         resolucao.resolucaoFilename = originalname;
         resolucao.status = 'pendente';
+        resolucao.comentarios = comentarios;
 
         console.log('resolucao existente, sobrescrevendo')
         await resolucao.save();
@@ -59,7 +61,8 @@ module.exports = {
           aluno: userId,
           resolucaoFilename: originalname,
           dataSubmissao: Date.now(),
-          materia: exercicio.materia
+          materia: exercicio.materia,
+          comentarios,
         });
         exercicio.submissoesCount++;
         await exercicio.save()
@@ -190,7 +193,7 @@ module.exports = {
       resolucao = await Resolucao.findOne(
         { exercicio: exercicioId, aluno: userId },
         // "exercicio resolucaoFilename tentativas dataSubmissao status"
-      );
+      ).populate("aluno", "nome _id");
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null });
     }

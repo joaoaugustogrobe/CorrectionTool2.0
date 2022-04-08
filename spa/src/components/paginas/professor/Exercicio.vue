@@ -87,7 +87,9 @@ export default {
   name: "Exercicio",
   mixins: [dataMixin],
   computed: {
-    ...mapGetters("professor", ["obterMateria", "obterTestes"]),
+    ...mapGetters("professor", ["obterTestes"]),
+    ...mapGetters("comum", ["obterMateria"]),
+    ...mapGetters('core', ['user', 'isProfessor', 'isAluno']),
     materia() {
       if (!this.exercicio.materia) return {};
       return this.obterMateria(this.exercicio?.materia?._id);
@@ -176,7 +178,7 @@ export default {
         exercicioId: exercicioId,
       });
 
-      await this.$store.dispatch("professor/obterMateria", {
+      await this.$store.dispatch("comum/obterMateria", {
         materiaId: this.exercicio.materia._id,
       });
 

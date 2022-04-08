@@ -203,6 +203,7 @@ export default {
         border-top: 1px solid var(--border-color);
         overflow-y: auto;
         padding: 20px;
+        height: 100%;
 
         .section{
           .section-title{

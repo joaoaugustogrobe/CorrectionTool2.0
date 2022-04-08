@@ -7,7 +7,7 @@ module.exports = {
   //Executado pelo broker após executar um exercicio
   async armazenarOutput(payload) {
     console.log('==========')
-    console.log('armazenarOutput', payload);
+    console.log('armazenarOutput para: ', payload.versao);
     const { input, materia, exercicio, aluno, resolucao, teste, output, versao } = payload;
     // const _output = parseOutput(payload.output);
 

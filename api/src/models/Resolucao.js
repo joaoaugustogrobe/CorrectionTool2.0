@@ -42,7 +42,12 @@ const resolucaoSchema = new mongoose.Schema({
         type: String,
         required: false,
         default: "pendente",
-    }
+    },
+    comentarios: {
+        type: String,
+        required: false,
+        default: '',
+    },
 }, { timestamps: true });
 
 

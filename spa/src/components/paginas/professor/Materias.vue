@@ -92,13 +92,13 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("professor", ["obterMaterias"]),
+    ...mapGetters("comum", ["obterMaterias"]),
     materias() {
       return this.obterMaterias;
     },
   },
   created() {
-    this.$store.dispatch("professor/obterMaterias");
+    this.$store.dispatch("comum/obterMaterias");
     // axios.get(`${backend.uri}/materia`).then((res) => {
     //   this.carregando = false;
     //   let materias = res.data.data;

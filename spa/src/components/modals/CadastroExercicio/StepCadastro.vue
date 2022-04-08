@@ -127,7 +127,7 @@ export default {
     ConfiguracaoItem,
   },
   computed: {
-    ...mapGetters("professor", ["obterMaterias"]),
+    ...mapGetters("comum", ["obterMaterias"]),
     exercicioAlterado() {
       return !_.isEqual(this.exercicio, this.form);
     },

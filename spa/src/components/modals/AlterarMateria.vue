@@ -75,7 +75,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('professor', ['obterMateria']),
+    ...mapGetters("comum", ["obterMateria"]),
     materia() {
       return this.obterMateria(this.materiaId) || {};
     },

@@ -1,10 +1,6 @@
 <template>
-  <div class="submissao">
-    <p
-      v-for="(linha, i) in codigoLinhas"
-      v-html="linha"
-      :key="i"
-    />
+  <div class="submissao" :class="{'hover': !disabled}">
+    <p v-for="(linha, i) in codigoLinhas" v-html="linha" :key="i" />
   </div>
 </template>
 
@@ -14,13 +10,17 @@ import { butify } from "../util/beautifier";
 export default {
   data() {
     return {
-      butify
-    }
+      butify,
+    };
   },
   props: {
     codigo: {
       type: String,
       default: "",
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -68,8 +68,8 @@ export default {
     white-space: nowrap;
 
     &:hover {
-      background-color: #efefef;
-      cursor: pointer;
+      background-color: #f6f6f6;
+      cursor: unset;
     }
 
     &:after {
@@ -81,6 +81,11 @@ export default {
       padding-left: 6px;
       color: #070;
     }
+  }
+  
+  &.hover p:hover{
+      background-color: #efefef;
+      cursor: pointer;
   }
 }
 .v-card__text .submissao {

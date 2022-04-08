@@ -88,7 +88,6 @@ router.beforeEach((to, from, next) => {
   const requerAluno = to.matched.some(record => record.meta.role == "aluno")
   const user = JSON.parse(localStorage.getItem("user"))
 
-  console.log(user, requerAuth);
 
   if (requerAuth) {
     if(!user)

@@ -40,7 +40,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("professor", ["obterMaterias"]),
+    ...mapGetters("comum", ["obterMaterias"]),
     exercicioAlterado() {
       return !_.isEqual(this.exercicio, this.form);
     },

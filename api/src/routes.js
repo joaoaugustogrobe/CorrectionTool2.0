@@ -86,5 +86,4 @@ routes.post('/testeresolucao/salvar', (req, res, next) => SessionController.vali
 
 routes.post('/docker', DockerController.containerCallback);
 
-
 module.exports = routes;

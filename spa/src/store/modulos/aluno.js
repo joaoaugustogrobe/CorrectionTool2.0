@@ -28,15 +28,20 @@ export default {
 			Vue.set(state.feedbackResolucao[resolucaoId].comentarios, linha, { ...state.feedbackResolucao[resolucaoId][linha], comentario });
 		},
 		guardarExerciciosMateria: (state, payload) => {
-			const {materiaId, exercicios} = payload;
+			const { materiaId, exercicios } = payload;
 
 			Vue.set(state.exercicios, materiaId, exercicios);
 		},
 		guardarResolucao: (state, payload) => {
-			const {exercicioId, resolucao} = payload;
+			const { exercicioId, resolucao } = payload;
 
 			Vue.set(state.resolucoes, exercicioId, resolucao);
-		}
+		},
+		guardarExercicio: (state, { exercicioId, exercicio }) => {
+			const exercicioIndex = _.findIndex(state.exercicios, { _id: exercicioId });
+			if (exercicioId === -1) return;
+			Vue.set(state.exercicios, exercicioIndex, exercicio);
+		},
 	},
 	actions: {
 		async downloadFeedback(context, resolucaoId) {
@@ -85,13 +90,13 @@ export default {
 			}
 		},
 
-		async obterResolucao(context, exercicioId){
+		async obterResolucao(context, exercicioId) {
 			const req = await context.state.client.get(`resolucao/${exercicioId}`);
 
 			if (req.ok) {
 				context.commit('guardarResolucao', {
 					exercicioId,
-					resolucao: req.data.resolucao
+					resolucao: {...req.data.resolucao, ...(req.data.resolucao && {timestamp: new Date().getTime()})}
 				});
 			} else {
 				context.commit("core/showMessage", {
@@ -99,10 +104,30 @@ export default {
 					error: true
 				}, { root: true });
 			}
+
+			return req;
 		},
 
-		async forgotPassword(context, email){
-			const req = await context.state.client.post('aluno/forgot_password', {email});
+		async obterExercicio(context, exercicioId) {
+			const req = await context.state.client.get(`${exercicioId}/show`);
+
+			if (req.ok) {
+				context.commit('guardarExercicio', {
+					exercicioId,
+					exercicio: req.data.exercicio
+				});
+			} else {
+				context.commit("core/showMessage", {
+					content: "Falha ao obter exercício!",
+					error: true
+				}, { root: true });
+			}
+
+		},
+
+
+		async forgotPassword(context, email) {
+			const req = await context.state.client.post('aluno/forgot_password', { email });
 
 			if (req.ok) {
 				context.commit("core/showMessage", {
@@ -118,7 +143,7 @@ export default {
 			return req;
 		},
 
-		async resetPassword(context, payload){
+		async resetPassword(context, payload) {
 			const req = await context.state.client.post('aluno/reset_password', payload);
 
 			if (req.ok) {
@@ -133,6 +158,11 @@ export default {
 				}, { root: true });
 			}
 			return req;
+		},
+
+		async submeterResolucao(context, payload) {
+			// const {arquivoResolucao, comentarios, exercicioId} = payload;
+			return await context.state.client.postMultipart("resolucao/submit", payload);
 		}
 	},
 	getters: {
@@ -145,10 +175,10 @@ export default {
 		obterExerciciosMateria: state => materiaId => {
 			return state.exercicios[materiaId] || [];
 		},
-		obterExercicio: (state, getters) => ({materiaId, exercicioId}) => {
+		obterExercicio: (state, getters) => ({ materiaId, exercicioId }) => {
 			const exercicios = getters['obterExerciciosMateria'](materiaId);
-			const index = _.findIndex(exercicios, {_id: exercicioId});
-			if(index > -1) return state.exercicios[materiaId][index];
+			const index = _.findIndex(exercicios, { _id: exercicioId });
+			if (index > -1) return state.exercicios[materiaId][index];
 			return {};
 		},
 		obterResolucao: (state) => (exercicioId) => {

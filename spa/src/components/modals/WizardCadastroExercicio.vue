@@ -44,7 +44,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("professor", ["obterMateria"]),
+    ...mapGetters("comum", ["obterMateria"]),
     materia() {
       return this.obterMateria(this.materiaId) || {};
     },
@@ -65,7 +65,7 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch("professor/obterMaterias");
+    this.$store.dispatch("comum/obterMaterias");
   },
 };
 </script>

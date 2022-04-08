@@ -9,9 +9,6 @@ export default {
     client: new CorrectionTool(),
     exercicios: [],
     submissoes: {}, //submissoes[exercicioId] = []
-    resolucaoTeste: {},//resolucaoTeste[resolucaoId] = [],
-    materias: {},
-    testes: {},
     alunos: {},
   },
   mutations: {
@@ -24,21 +21,6 @@ export default {
       const { submissoes, exercicioId } = payload;
 
       Vue.set(state.submissoes, exercicioId, submissoes);
-    },
-    guardarMateria: (state, payload) => {
-      const { materia, materiaId } = payload;
-
-      Vue.set(state.materias, materiaId, materia);
-    },
-    guardarResolucaoTeste: (state, payload) => { //Relação entre teste e resolução
-      const { testes, resolucaoId } = payload;
-
-      Vue.set(state.resolucaoTeste, resolucaoId, testes);
-    },
-    guardarTestesExercicio: (state, payload) => { //Teste, associado a um exercicio
-      const { testes, exercicioId } = payload;
-
-      Vue.set(state.testes, exercicioId, testes);
     },
     salvarTesteExercicio: (state, payload) => {
       const { teste, exercicioId } = payload;
@@ -93,22 +75,6 @@ export default {
         });
       }
     },
-    async obterMateria(context, payload) {
-      const { materiaId } = payload;
-      const req = await context.state.client.get(`materia/${materiaId}/show`);
-
-      if (req.ok) {
-        context.commit('guardarMateria', {
-          materiaId,
-          materia: req.data
-        });
-      } else {
-        context.commit("core/showMessage", {
-          content: "Falha ao obter matéria!",
-          error: true
-        }, { root: true });
-      }
-    },
     async obterTestesExercicio(context, payload) {
       const { exercicioId } = payload;
       const req = await context.state.client.get(`exercicio/${exercicioId}/testes`);
@@ -161,25 +127,12 @@ export default {
         });
       }
     },
-    async downloadSubmissao(context, submissaoId) {
-      const req = await context.state.client.getPlain(`resolucao/${submissaoId}/download`);
-      return req;
-    },
 
     async downloadFeedback(context, submissaoId) {
       const req = await context.state.client.get(`correcao/${submissaoId}`);
       return req;
     },
 
-    async obterDadosExecucao(context, resolucaoId) {
-      const req = await context.state.client.get(`resolucao/testes/${resolucaoId}`);
-
-
-      context.commit('guardarResolucaoTeste', {
-        resolucaoId,
-        testes: req.data.testes
-      });
-    },
 
     async obterAlunosMateria(context, materiaId) {
       const req = await context.state.client.get(`${materiaId}/alunos`);
@@ -283,87 +236,6 @@ export default {
       }
     },
 
-    async obterMaterias(context) {
-      const req = await context.state.client.get('materia');
-
-      if (req.ok) {
-        const materias = req.data;
-
-        materias.forEach(materia => {
-          context.commit('guardarMateria', {
-            materiaId: materia._id,
-            materia: materia,
-          });
-        })
-      } else {
-        context.commit("core/showMessage", {
-          content: "Falha ao salvar matéria!",
-          error: true
-        }, { root: true });
-      }
-    },
-
-    async salvarTeste(context, payload) {
-
-      const req = await context.state.client.post('testes/salvar', { ...payload, testeId: payload._id, exercicioId: payload.exercicio });
-
-      if (req.ok) {
-        context.commit('salvarTesteExercicio', {
-          exercicioId: req.data.data.teste.exercicio,
-          teste: req.data.data.teste
-        });
-        context.commit("core/showMessage", {
-          content: "Teste salvo com sucesso!",
-          error: false,
-        }, { root: true });
-      } else {
-        context.commit("core/showMessage", {
-          content: "Falha ao salvar teste!",
-          error: true
-        }, { root: true });
-      }
-    },
-
-    async criarTeste(context, payload) {
-      const req = await context.state.client.post('testes/create', payload);
-
-      if (req.ok) {
-        context.commit('criarTesteExercicio', {
-          exercicioId: req.data.data.teste.exercicio,
-          teste: req.data.data.teste
-        });
-        context.commit("core/showMessage", {
-          content: "Teste criado com sucesso!",
-          error: false,
-        }, { root: true });
-      } else {
-        context.commit("core/showMessage", {
-          content: "Falha ao criar teste!",
-          error: true
-        }, { root: true });
-      }
-    },
-
-    async deletarTeste(context, { testeId, exercicioId }) {
-      const req = await context.state.client.post('testes/deletar', { testeId });
-
-      if (req.ok) {
-        context.commit('deletarTesteExercicio', {
-          exercicioId,
-          testeId,
-        });
-        context.commit("core/showMessage", {
-          content: "Teste deletado com sucesso!",
-          error: false,
-        }, { root: true });
-      } else {
-        context.commit("core/showMessage", {
-          content: "Falha ao deletar teste!",
-          error: true
-        }, { root: true });
-      }
-    },
-
     async atualizarTesteResolucao(context, testeResolucao) {
       const req = await context.state.client.post('testeresolucao/salvar', {testeResolucaoId: testeResolucao._id, isError: testeResolucao.isError});
 
@@ -387,8 +259,8 @@ export default {
     obterSubmissoesExercicio: state => exercicioId => {
       return state.submissoes[exercicioId] || [];
     },
-    obterTodasSubmissoesExercicio: state => (exercicioId, materiaId) => {
-      const materia = state.materias[materiaId];
+    obterTodasSubmissoesExercicio: (state, getters, globalState, globalGetters) => (exercicioId, materiaId) => {
+      const materia = globalGetters['comum/obterMateria'](materiaId);
       if (!materia) return [];
 
       const alunos = materia.alunos;
@@ -413,17 +285,8 @@ export default {
     obterExercicio: state => exercicioId => {
       return _.find(state.exercicios, { _id: exercicioId }) || {};
     },
-    obterMateria: state => materiaId => {
-      return state.materias[materiaId] || null;
-    },
-    obterTestes: state => exercicioId => {
-      return state.testes[exercicioId] || [];
-    },
     obterAlunos: state => materiaId => {
       return state.alunos[materiaId] || [];
     },
-    obterMaterias: state => {
-      return _.values(state.materias);
-    }
   }
 };

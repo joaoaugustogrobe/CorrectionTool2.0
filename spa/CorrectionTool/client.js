@@ -139,8 +139,14 @@ class CorrectionTool {
           }
         );
 
-        if (!response.data.meta.ok) {
-          throw new Error(response.data.meta.error);
+        if(response.data && response.data.meta && !response.data.meta.ok) {
+          return {
+            meta: response.data.meta,
+            ok: String(response.status).charAt(0) == '2',
+            unauthorized: (response.status === 401),
+            error: (response.data.meta.error) ? response.data.meta.error : false
+          }
+
         }
 
         return {

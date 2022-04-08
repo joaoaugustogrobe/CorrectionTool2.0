@@ -87,7 +87,8 @@ export default {
     Configuracoes,
   },
   computed: {
-    ...mapGetters("professor", ["obterMateria", "obterExercicio"]),
+    ...mapGetters("professor", ["obterExercicio"]),
+    ...mapGetters("comum", ["obterMateria"]),
     materia() {
       return this.obterMateria(this.materiaId) || {};
     },
