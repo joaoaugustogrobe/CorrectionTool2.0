@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mdi/js": "^6.2.95",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "core-js": "^3.22.0",
     "dayjs": "^1.10.7",
     "font-awesome": "^4.7.0",
