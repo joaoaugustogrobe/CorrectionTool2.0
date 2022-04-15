@@ -14,3 +14,11 @@ api/dist/
 corretor/.env
 
 corretor/temp/
+
+spa/package-lock.json
+
+env/prod/proxy/certbot/data/keys/
+
+env/prod/proxy/certbot/data/csr/
+
+env/prod/spa/dist/build/
