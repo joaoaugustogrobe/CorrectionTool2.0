@@ -26,7 +26,7 @@ server {
         proxy_pass http://p_spa:80;
     }
     location /api/ {
-        proxy_pass http://p_web:80;
+        proxy_pass http://p_api:3333;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Proto https;
