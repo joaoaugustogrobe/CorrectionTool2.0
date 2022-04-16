@@ -14,6 +14,7 @@ echo
 echo '### BUILD THE SPA DIST VERSION ###'
 # $dc run --rm spa npm run build --mode=production
 cd spa/
+mv config/index_production.js config/index.js
 npm run build --mode=production
 cd ..
 
