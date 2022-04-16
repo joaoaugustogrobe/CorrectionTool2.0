@@ -1,5 +1,4 @@
-var config={
-    uri: 'http://localhost:8092'
+const { config } = require('../config');
+export default {
+    uri: config.SERVER_BASE_URL,
 }
-
-export default config;
