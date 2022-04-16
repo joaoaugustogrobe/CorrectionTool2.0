@@ -1,14 +1,12 @@
 import axios from 'axios';
 import store from 'store';
 import vueStore from '../src/store/index';
-
-import qs from 'querystring';
-
+require('dotenv').config()
 
 class CorrectionTool {
   constructor() {
     this.version = 'v1';
-    this.url = "http://localhost:8092";
+    this.url = process.env.SERVER_BASE_URL ? process.env.SERVER_BASE_URL : "http://localhost:8092";
 
     // base axios config
     this.config = {

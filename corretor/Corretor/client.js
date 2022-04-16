@@ -9,7 +9,7 @@ require('dotenv').config()
 class Corretor {
   constructor() {
     this.version = 'v1';
-    this.url = `http://${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`;
+    this.url = process.env.SERVER_BASE_URL ? process.env.SERVER_BASE_URL : "http://localhost:8092";
     this.token = '';
 
     // base axios config

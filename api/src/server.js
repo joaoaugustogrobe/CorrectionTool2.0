@@ -24,14 +24,7 @@ app.use(cors({
 }))
 app.use(cookieParser())
 app.use(express.json());
-
-
-if(process.env.mode === 'production')
-  app.use('/api', routes);
-else
-  app.use(routes);
-
-
+app.use(process.env.NODE_ENV === 'production' ? '/api' : '/', routes);
 
 run();
 

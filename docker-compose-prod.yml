@@ -75,7 +75,7 @@ services:
       - QUEUE_HOST=p_rabbitmq
       - DB_HOST=p_mongo
       - DB_DATABASE=correctiontool
-      - mode=production
+      - NODE_ENV=production
     working_dir: /var/www
     command: "npm run prod"
     restart: always
