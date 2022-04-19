@@ -1,5 +1,6 @@
 const Professor = require('../models/Professor');
 const SessionController = require('./SessionController');
+const bcrypt = require('bcryptjs');
 
 const { mapErrors } = require('../Validation/index');
 
