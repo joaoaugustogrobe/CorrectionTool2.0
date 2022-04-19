@@ -112,5 +112,5 @@ volumes:
   p_rabbitmq_log:
 
 networks:
- rabbitmq_go_net:
+  rabbitmq_go_net:
     driver: bridge
