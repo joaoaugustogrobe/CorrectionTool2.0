@@ -8,7 +8,6 @@ module.exports = {
         let testeResolucao;
         try {
             mapErrors(req).throw();
-            console.log(testeResolucaoId, isError)
             if (await user.cannot("testeresolucao/salvar", { testeResolucaoId })) throw "Permissão insuficiente";
             console.log(2)
             testeResolucao = await TesteResolucao.findById(testeResolucaoId);
