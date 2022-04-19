@@ -367,5 +367,25 @@ schemas['POST/admin/create'] = {
 }
 
 
+schemas['POST/professor/create'] = {
+	email: {
+		isEmail: {
+			errorMessage: "Email inválido",
+		},
+	},
+	nome: {
+		isLength: {
+			errorMessage: 'Título deve conter ao menos 3 caracteres',
+			options: { min: 3 },
+		},
+	},
+	password: {
+		isLength: {
+			errorMessage: "Password deve conter ao menos 8 caracteres",
+			options: {min: 8}
+		}
+	}
+}
+
 module.exports = schemas;
 

@@ -1,5 +1,7 @@
 const Professor = require('../models/Professor');
-const SessionController = require('./SessionController')
+const SessionController = require('./SessionController');
+
+const { mapErrors } = require('../Validation/index');
 
 module.exports = {
   async authenticate(req, res) {
@@ -22,7 +24,35 @@ module.exports = {
 
     let token = SessionController.generateToken({ id: professor._id, role: "professor" })
     res.cookie("x-access-token", token);
-    return res.status(200).send({ status: "success", message: "Professor encontrado!!!", data: { user: {nome: professor.nome, role: "professor", gravatarUrl: professor.gravatarUrl, id: professor._id}, token: token } })
+    return res.status(200).send({ status: "success", message: "Professor encontrado!!!", data: { user: { nome: professor.nome, role: "professor", gravatarUrl: professor.gravatarUrl, id: professor._id }, token: token } })
 
+  },
+
+  async store(req, res) {
+    const { email, nome, password } = req.body;
+    let professor;
+    let token;
+
+    try {
+      mapErrors(req).throw();
+
+      professor = await Professor.findOne({ email })
+      if (professor)
+        return res.status(401).send({ status: "error", message: "Email já cadastrado.", data: null })
+
+      professor = await Professor.create({
+        email,
+        nome,
+        password
+      });
+
+      token = SessionController.generateToken({ id: professor._id, role: "professor" });
+      // res.cookie("x-access-token", token);
+    }
+    catch (e) {
+      return res.status(401).send({ status: "error", message: e && typeof (e) === 'object' && e.array ? e.mapped() : e, data: null });
+    }
+
+    return res.status(200).send({ status: "success", message: "Professor cadastrado!!!", data: { user: { nome: professor.nome, role: "professor", gravatarUrl: professor.gravatarUrl }, token } })
   },
 };
