@@ -1,33 +1,25 @@
 print('Start #################################################################');
+db = db.getSiblingDB(_getEnv("MONGO_INITDB_DATABASE"));
 
-db = db.getSiblingDB('api_prod_db');
 db.createUser(
   {
-    user: 'api_user',
-    pwd: 'api1234',
-    roles: [{ role: 'readWrite', db: 'api_prod_db' }],
+    user: _getEnv("MONGO_INITDB_ROOT_USERNAME"),
+    pwd: _getEnv("MONGO_INITDB_ROOT_PASSWORD"),
+    roles: [{ role: 'readWrite', db: _getEnv("MONGO_INITDB_DATABASE") }],
   },
 );
-db.createCollection('users');
 
-db = db.getSiblingDB('api_dev_db');
-db.createUser(
-  {
-    user: 'api_user',
-    pwd: 'api1234',
-    roles: [{ role: 'readWrite', db: 'api_dev_db' }],
-  },
-);
-db.createCollection('users');
+db.createCollection('admins');
+db.createCollection('alunos');
+db.createCollection('comentarios');
+db.createCollection('correcaos');
+db.createCollection('exercicios');
+db.createCollection('materias');
+db.createCollection('matriculas');
+db.createCollection('professors');
+db.createCollection('resolucaos');
+db.createCollection('testeresolucao');
+db.createCollection('testes');
 
-db = db.getSiblingDB('api_test_db');
-db.createUser(
-  {
-    user: 'api_user',
-    pwd: 'api1234',
-    roles: [{ role: 'readWrite', db: 'api_test_db' }],
-  },
-);
-db.createCollection('users');
 
 print('END #################################################################');

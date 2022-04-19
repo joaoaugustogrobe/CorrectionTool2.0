@@ -51,10 +51,8 @@ services:
       RABBITMQ_DEFAULT_USER: user1234
       RABBITMQ_DEFAULT_PASS: user1234
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq/
-      - rabbitmq_log:/var/log/rabbitmq/
-#    networks:
-#      - rabbitmq_go_net
+      - p_rabbitmq_data:/var/lib/rabbitmq/
+      - p_rabbitmq_log:/var/log/rabbitmq/
 
 
   p_api:
@@ -72,10 +70,14 @@ services:
         source: ./api/uploads
         target: /usr/local/Exercicios
     environment:
-      - QUEUE_HOST=p_rabbitmq
-      - DB_HOST=p_mongo
-      - DB_DATABASE=correctiontool
-      - NODE_ENV=production
+      QUEUE_HOST: p_rabbitmq
+      NODE_ENV: production
+      DB_USERNAME: "${MONGO_INITDB_ROOT_USERNAME:-root}"
+      DB_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD:-example}"
+      DB_DATABASE: "${MONGO_INITDB_DATABASE:-correctiontool}"
+      DB_HOST: p_mongo
+      DB_PORT: 27017
+
     working_dir: /var/www
     command: "npm run prod"
     restart: always
@@ -88,24 +90,18 @@ services:
     container_name: 'p_monogo'
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: correctiontool
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME:-root}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD:-example}"
+      MONGO_INITDB_DATABASE: "${MONGO_INITDB_DATABASE:-correctiontool}"
     volumes:
       - type: bind
         source: ./env/prod/mongo/mongo-init.js
         target: /docker-entrypoint-initdb.d/mongo-init.js
-      - mongodata:/data/db #Helps to store MongoDB data in `./mongo/data`
-      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
-      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js:ro
+      - p_mongodata:/data/db
     ports:
       - 27017:27017
-  
-volumes:
-  mongodata:
-  rabbitmq_data:
-  rabbitmq_log:
 
-#networks:
-#  rabbitmq_go_net:
-#     driver: bridge
+volumes:
+  p_mongodata:
+  p_rabbitmq_data:
+  p_rabbitmq_log:

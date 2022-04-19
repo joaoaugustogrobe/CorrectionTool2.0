@@ -24,3 +24,5 @@ env/prod/proxy/certbot/data/csr/
 env/prod/spa/dist/build/
 
 spa/.env
+
+.env
