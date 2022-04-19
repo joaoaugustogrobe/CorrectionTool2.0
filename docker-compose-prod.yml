@@ -53,9 +53,9 @@ services:
     volumes:
       - p_rabbitmq_data:/var/lib/rabbitmq/
       - p_rabbitmq_log:/var/log/rabbitmq/
-   networks:
-     - rabbitmq_go_net
-     - default
+    networks:
+      - rabbitmq_go_net
+      - default
 
 
   p_api:
