@@ -43,7 +43,7 @@ const alunoSchema = new mongoose.Schema({
 });
 
 alunoSchema.pre('save', async function(next){
-  const hash = await bcrypt.hash(this.password, 10);
+  const hash = await bcrypt.hash(`${this.password}${this.salt}`, 10);
   this.password = hash;
 
   next();

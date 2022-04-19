@@ -9,14 +9,14 @@ module.exports = {
       return res.status(400).send({ status: "error", message: "Informações inválidas.", data: null })
     let professor
     try {
-      professor = await Professor.findOne({ email });
+      professor = await Professor.findOne({ email }).select('+salt +password');
       if (!professor) throw { status: "error", message: "Usuario ou senha incorretos.", data: null }
     } catch (e) {
       return res.status(400).send({ status: "error", ...e, data: null })
     }
 
 
-    if (password != professor.password)
+    if (!bcrypt.compareSync(`${password}${professor.salt}`, `${professor.password}${professor.salt}`))
       return res.status(401).send({ status: "error", message: "Usuario ou senha incorretos.", data: null })
 
 

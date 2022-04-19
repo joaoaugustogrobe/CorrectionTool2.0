@@ -21,7 +21,7 @@ module.exports = {
     } catch (e) {
       return res.status(400).send({ status: "error", message: e, data: null })
     }
-    if (!bcrypt.compareSync(password + aluno.salt, aluno.password))
+    if (!bcrypt.compareSync(`${password}${aluno.salt}`, `${aluno.password}${aluno.salt}`))
       return res.status(401).send({ status: "error", message: "Usuario ou senha incorretos.", data: null });
 
     const token = SessionController.generateToken({ id: aluno._id, role: "aluno" })
