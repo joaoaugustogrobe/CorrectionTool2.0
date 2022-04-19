@@ -27,7 +27,7 @@ const upload = multer(uploadConfig);
 
 //Professor
 routes.post('/professor/login', ProfessorController.authenticate);
-routes.post('professor/create', (req, res, next) => SessionController.validar(req, res, next, "admin"), checkSchema(schemas['POST/professor/create'],  ProfessorController.store);
+routes.post('/professor/create', (req, res, next) => SessionController.validar(req, res, next, "admin"), checkSchema(schemas['POST/professor/create'],  ProfessorController.store);
 
 //Admin
 routes.post('/admin/create', checkSchema(schemas['POST/admin/create']), AdminController.store);
