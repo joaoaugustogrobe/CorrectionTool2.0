@@ -375,7 +375,7 @@ schemas['POST/professor/create'] = {
 	},
 	nome: {
 		isLength: {
-			errorMessage: 'Título deve conter ao menos 3 caracteres',
+			errorMessage: 'Nome deve conter ao menos 3 caracteres',
 			options: { min: 3 },
 		},
 	},

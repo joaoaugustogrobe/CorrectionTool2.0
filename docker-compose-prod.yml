@@ -53,6 +53,9 @@ services:
     volumes:
       - p_rabbitmq_data:/var/lib/rabbitmq/
       - p_rabbitmq_log:/var/log/rabbitmq/
+   networks:
+     - rabbitmq_go_net
+     - default
 
 
   p_api:
@@ -97,7 +100,9 @@ services:
       - type: bind
         source: ./env/prod/mongo/mongo-init.js
         target: /docker-entrypoint-initdb.d/mongo-init.js
-      - p_mongodata:/data/db
+      - p_mongodata:/data/db #Helps to store MongoDB data in `./mongo/data`
+      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
+      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js:ro
     ports:
       - 27017:27017
 
@@ -105,3 +110,7 @@ volumes:
   p_mongodata:
   p_rabbitmq_data:
   p_rabbitmq_log:
+
+networks:
+ rabbitmq_go_net:
+    driver: bridge
