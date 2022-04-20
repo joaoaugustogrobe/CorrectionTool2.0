@@ -31,9 +31,8 @@ echo '### INSTALL CORRETOR DEPENDENCIES ###'
 # $dc run --rm spa npm run build --mode=production
 cd corretor/
 npm install
+mkdir -p temp
 cd ..
-
-
 
 echo
 echo '### MOVE BUILD FOLDER ###'
