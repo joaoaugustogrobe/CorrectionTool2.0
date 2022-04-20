@@ -26,6 +26,14 @@ cd api/
 npm install
 cd ..
 
+echo
+echo '### INSTALL CORRETOR DEPENDENCIES ###'
+# $dc run --rm spa npm run build --mode=production
+cd corretor/
+npm install
+cd ..
+
+
 
 echo
 echo '### MOVE BUILD FOLDER ###'
