@@ -6,7 +6,8 @@
   "author": "João Augusto Grobe Castilho",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "prod": "node src/index.js"
   },
   "dependencies": {
     "amqplib": "^0.8.0",

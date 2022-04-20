@@ -10,10 +10,10 @@ const amqpConfig = {
     protocol: 'amqp',
     vhost: '/',
     authMechanism: ['PLAIN', 'AMQPLAIN', 'EXTERNAL'],
-    hostname: process.env.QUEUE_HOST,
-    username: process.env.QUEUE_USER,
-    password: process.env.QUEUE_PASSWORD,
-    port: process.env.QUEUE_PORT,
+    hostname: process.env.RABBITMQ_HOST,
+    username: process.env.RABBITMQ_USERNAME,
+    password: process.env.RABBITMQ_PASSWORD,
+    port: process.env.RABBITMQ_PORT,
 }
 
 

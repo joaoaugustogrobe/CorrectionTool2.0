@@ -13,8 +13,11 @@ async function run() {
     console.log("[INFO] - Conectando-se ao Kafka");
     try {
 
-        const res = await client.post('admin/login', { email: process.env.CLIENT_EMAIL, password: process.env.CLIENT_PASSWORD });
-        if (!res.ok) throw `Não foi possivel conectar com o servidor - ${res}`
+        const res = await client.post('admin/login', { email: process.env.API_ADMIN_EMAIL, password: process.env.API_ADMIN_PASSWORD });
+        if (!res.ok) {
+            console.log('[ERROR] - Não foi possivel conectar com o servidor', process.env.SERVER_BASE_URL)
+            throw res
+        }
         else {
             client.setToken(res.data.data.token);
             console.log('[OK] Servidor conectado');
