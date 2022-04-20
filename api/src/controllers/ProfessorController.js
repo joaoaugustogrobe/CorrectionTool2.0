@@ -19,7 +19,7 @@ module.exports = {
     }
 
 
-    if (!bcrypt.compareSync(`${password}${professor.salt}`, `${professor.password}${professor.salt}`))
+    if (!bcrypt.compareSync(`${password}${professor.salt}`, professor.password))
       return res.status(401).send({ status: "error", message: "Usuario ou senha incorretos.", data: null })
 
 
