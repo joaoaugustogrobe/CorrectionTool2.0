@@ -352,21 +352,6 @@ schemas['POST/admin/login'] = {
 	}
 }
 
-schemas['POST/admin/create'] = {
-	email: {
-		isEmail: {
-			errorMessage: "Email inválido",
-		},
-	},
-	password: {
-		isLength: {
-			errorMessage: "Password inválido",
-			options: {min: 12}
-		}
-	}
-}
-
-
 schemas['POST/professor/create'] = {
 	email: {
 		isEmail: {
