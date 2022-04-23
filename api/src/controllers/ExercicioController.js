@@ -135,7 +135,7 @@ module.exports = {
       mapErrors(req).throw();
       if (await user.cannot("exercicio/salvar", { exercicioId })) throw "Permissão insuficiente";
 
-      exercicio = await Exercicio.findById(exercicioId, '_id titulo visivel descricao prazo submissoesCount nomeFuncao').populate("materia", "nome");
+      exercicio = await Exercicio.findById(exercicioId, '_id titulo visivel descricao prazo submissoesCount nomeFuncao assinatura').populate("materia", "nome");
 
       exercicio.titulo = titulo;
       exercicio.descricao = descricao;

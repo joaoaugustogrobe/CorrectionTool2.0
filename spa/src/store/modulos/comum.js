@@ -50,6 +50,12 @@ export default {
 			testes.push(teste);
 			Vue.set(state.testes, exercicioId, testes);
 		},
+		salvarTesteExercicio: (state, payload) => {
+			const { teste, exercicioId } = payload;
+			const testeIndex = _.findIndex(state.testes[exercicioId], { _id: teste._id });
+			if (testeIndex >= 0)
+				Vue.set(state.testes[exercicioId], testeIndex, teste);
+		},
 		guardarResolucaoTeste: (state, payload) => { //Relação entre teste e resolução
 			const { testes, resolucaoId } = payload;
 

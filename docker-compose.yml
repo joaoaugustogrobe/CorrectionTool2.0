@@ -46,15 +46,18 @@ services:
       API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD:-example}
     working_dir: /var/www
     command: "npm run dev"
+    restart: always
     depends_on:
       - rabbitmq
+    networks:
+      - default
+      - localbridge
     
-
   corretor:
     build:
       context: "./env/dev/corretor"
-    # depends_on:
-      # - kafka
+    depends_on:
+      - api
     volumes:
       - type: bind
         source: ./corretor
@@ -64,8 +67,18 @@ services:
         target: /usr/local/Exercicios
     # working_dir: /var/www
     command: "npm run dev"
-
-
+    restart: always
+    environment:
+      RABBITMQ_USERNAME: "${RABBITMQ_USERNAME:-root}"
+      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD:-example}"
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-p_rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      SERVER_BASE_URL: "${SERVER_BASE_URL:-joaocastilho.com.br/api}"
+      API_ADMIN_EMAIL: ${API_ADMIN_EMAIL:-admin@joaocastilho.com.br}
+      API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD:-example}
+    networks:
+      - default
+      - localbridge
 
   mongo:
     #image: mongo
@@ -126,5 +139,7 @@ volumes:
   rabbitmq_log:
 
 networks:
- rabbitmq_go_net:
+  rabbitmq_go_net:
+    driver: bridge
+  localbridge:
     driver: bridge

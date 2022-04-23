@@ -19,7 +19,7 @@ module.exports = {
 
       if (!aluno) throw { status: "error", message: "Usuario ou senha incorretos.", data: null }
     } catch (e) {
-      return res.status(400).send({ status: "error", message: e, data: null })
+      throw { status: "error", message: "Usuario ou senha incorretos.", data: null }
     }
     if (!bcrypt.compareSync(`${password}${aluno.salt}`, aluno.password))
       return res.status(401).send({ status: "error", message: "Usuario ou senha incorretos.", data: null });

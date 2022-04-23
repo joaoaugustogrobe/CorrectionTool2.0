@@ -97,7 +97,7 @@ export default {
           else this.$router.push("aluno");
         })
         .catch(e => {
-          this.senhaErro = e.response?.data?.message;
+          this.senhaErro = e.response?.data?.message || '';
           this.$store.commit("core/showMessage", {
             content: "Não foi possivel efetuar o login!",
             error: true

@@ -238,12 +238,12 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("professor", ["obterTestes"]),
+    ...mapGetters("comum", ["obterTestes"]),
     testes() {
       return this.obterTestes(this.exercicio._id);
     },
     loading() {
-      return this.$store.state.loading["professor/salvarTeste"];
+      return this.$store.state.loading["comum/salvarTeste"];
     },
     testeAlterado() {
       if (this.testeIndex === -1) return false;
@@ -270,13 +270,13 @@ export default {
     onSalvar() {
       const formValido = this.$refs?.form[0]?.validate();
       if(formValido)
-        this.$store.dispatch("professor/salvarTeste", this.formTeste);
+        this.$store.dispatch("comum/salvarTeste", this.formTeste);
     },
     onCancelar() {
       this.resetarForm();
     },
     onDeletar() {
-      this.$store.dispatch("professor/deletarTeste", {
+      this.$store.dispatch("comum/deletarTeste", {
         testeId: this.formTeste._id,
         exercicioId: this.exercicio._id,
       });
@@ -310,7 +310,7 @@ export default {
     async onCriar() {
       const formValido = this.$refs.formCriacao.validate();
       if (formValido) {
-        await this.$store.dispatch("professor/criarTeste", {
+        await this.$store.dispatch("comum/criarTeste", {
           ...this.formTeste,
           exercicioId: this.exercicio._id,
         });

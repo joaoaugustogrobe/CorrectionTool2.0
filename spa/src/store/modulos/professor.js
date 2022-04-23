@@ -22,24 +22,6 @@ export default {
 
       Vue.set(state.submissoes, exercicioId, submissoes);
     },
-    salvarTesteExercicio: (state, payload) => {
-      const { teste, exercicioId } = payload;
-      const testeIndex = _.findIndex(state.testes[exercicioId], { _id: teste._id });
-      if (testeIndex >= 0)
-        Vue.set(state.testes[exercicioId], testeIndex, teste);
-    },
-    deletarTesteExercicio: (state, { testeId, exercicioId }) => {
-      let testes = state.testes[exercicioId];
-      const testeIndex = _.findIndex(testes, { _id: testeId });
-      if (testeIndex >= 0) {
-        Vue.delete(state.testes[exercicioId], testeIndex);
-      }
-    },
-    criarTesteExercicio: (state, { teste, exercicioId }) => {
-      let testes = state.testes[exercicioId];
-      testes.push(teste);
-      Vue.set(state.testes, exercicioId, testes);
-    },
     guardarAlunos: (state, payload) => {
       const { alunos, materiaId } = payload;
 

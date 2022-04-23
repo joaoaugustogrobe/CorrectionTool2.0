@@ -87,8 +87,7 @@ export default {
   name: "Exercicio",
   mixins: [dataMixin],
   computed: {
-    ...mapGetters("professor", ["obterTestes"]),
-    ...mapGetters("comum", ["obterMateria"]),
+    ...mapGetters("comum", ["obterMateria", "obterTestes"]),
     ...mapGetters('core', ['user', 'isProfessor', 'isAluno']),
     materia() {
       if (!this.exercicio.materia) return {};
@@ -172,7 +171,7 @@ export default {
     async init() {
       const exercicioId = this.$route.params.id;
 
-      this.$store.dispatch("professor/obterTestesExercicio", { exercicioId });
+      this.$store.dispatch("comum/obterTestesExercicio", { exercicioId });
 
       await this.$store.dispatch("professor/obterSubmissoes", {
         exercicioId: exercicioId,
