@@ -30,8 +30,20 @@ services:
       - type: bind
         source: ./api/uploads
         target: /usr/local/Exercicios
-    # links:
-      # - mongo
+    environment:
+      QUEUE_HOST: rabbitmq
+      NODE_ENV: development
+      DB_USERNAME: "${MONGO_INITDB_ROOT_USERNAME:-root}"
+      DB_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD:-example}"
+      DB_DATABASE: "${MONGO_INITDB_DATABASE:-correctiontool}"
+      DB_HOST: mongo
+      DB_PORT: 27017
+      RABBITMQ_USERNAME: "${RABBITMQ_USERNAME:-root}"
+      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD:-example}"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      API_ADMIN_EMAIL: ${API_ADMIN_EMAIL:-admin@joaocastilho.com.br}
+      API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD:-example}
     working_dir: /var/www
     command: "npm run dev"
     depends_on:
@@ -61,13 +73,13 @@ services:
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME:-root}"
-      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_USERNAME:-example}"
-      MONGO_INITDB_DATABASE: "${MONGO_INITDB_ROOT_USERNAME:-correctiontool}"
-
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD:-example}"
+      MONGO_INITDB_DATABASE: "${MONGO_INITDB_DATABASE:-correctiontool}"
     volumes:
-      - mongodata:/data/db #Helps to store MongoDB data in `./mongo/data`
-      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
-      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js:ro
+      - type: bind
+        source: ./env/prod/mongo/mongo-init.js
+        target: /docker-entrypoint-initdb.d/mongo-init.js
+      - dev_mongodata:/data/db #Helps to store MongoDB data in `./mongo/data`
     ports:
       - 27017:27017
 
@@ -78,7 +90,7 @@ services:
       - 8094:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: "${MONGO_INITDB_ROOT_USERNAME:-root}"
-      ME_CONFIG_MONGODB_ADMINPASSWORD: "${MONGO_INITDB_ROOT_USERNAME:-example}"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "${MONGO_INITDB_ROOT_PASSWORD:-example}"
     depends_on:
       - mongo
 
@@ -92,9 +104,6 @@ services:
       RELAY_USERNAME: noreply@joaocastilho.com.br
       RELAY_PASSWORD: /lo@der.js:1085:14
 
-
-
-
   rabbitmq:
     image: rabbitmq:3-management
     container_name: 'rabbitmq'
@@ -102,18 +111,19 @@ services:
       - 5672:5672
       - 15672:15672
     environment:
-      RABBITMQ_DEFAULT_USER: user1234
-      RABBITMQ_DEFAULT_PASS: user1234
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USERNAME:-root}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:-example}"
     volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_log:/var/log/rabbitmq/
     networks:
       - rabbitmq_go_net
       - default
 
 volumes:
-  mongodata:
-  composer-volume:
+  dev_mongodata:
+  rabbitmq_data:
+  rabbitmq_log:
 
 networks:
  rabbitmq_go_net:
