@@ -6,7 +6,8 @@ class DockerClient {
 	client = null;
 
 	constructor(client) {
-		this.docker = new Docker({ protocol: 'http', host: 'host.docker.internal', port: 2376 });
+		// this.docker = new Docker({ protocol: 'http', host: 'host.docker.internal', port: 2376 });
+		this.docker = new Docker({socketPath: '/var/run/docker.sock'});
 		this.client = client;
 	}
 
@@ -38,7 +39,7 @@ class DockerClient {
 				Tty: false,
 				HostConfig: {
 					AutoRemove: true,
-					Binds: ["/Users/joaoaugusto/Documents/Repositorios/CorrectionTool2.0/corretor/temp:/usr/local/Exercicios/"]
+					Binds: [`${process.env.TEMP_FOLDER_FULL_PATH}:/usr/local/Exercicios/`]
 				}
 			},
 				function (err, data, container) {
