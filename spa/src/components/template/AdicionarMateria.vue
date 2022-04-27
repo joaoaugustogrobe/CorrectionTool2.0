@@ -11,14 +11,13 @@
       </v-card-title>
       <v-card-text>
         <v-form class="px-3" ref="form">
-          <v-text-field label="Nome" v-model="nomeMateria" :rules="[rules.required, rules.min]"></v-text-field>
+          <v-text-field label="Nome" v-model="nomeMateria" :rules="[rules.required, rules.min]" :autocomplete="false"></v-text-field>
           <v-text-field
             label="Senha"
             v-model="senhaMateria"
-            :type="exibirSenha ? 'text' : 'password'"
+            :autocomplete="false"
+            type="text"
             :rules="[rules.required, rules.min]"
-            :append-icon="exibirSenha ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="exibirSenha = !exibirSenha"
           ></v-text-field>
           <div>
             <v-subheader class="pl-0">Máximo de alunos: {{capacidade}}</v-subheader>

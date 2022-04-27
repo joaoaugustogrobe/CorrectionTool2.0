@@ -4,8 +4,8 @@
 
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-    <title>Reset Password Email Template</title>
-    <meta name="description" content="Reset Password Email Template.">
+    <title>Convite para Correction Tool!</title>
+    <meta name="description" content="Convite para Correction Tool!.">
     <style type="text/css">
         a:hover {text-decoration: underline !important;}
     </style>
@@ -41,17 +41,26 @@
                                 </tr>
                                 <tr>
                                     <td style="padding:0 35px;">
-                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">Você solicitou resetar sua senha</h1>
+                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">Você recebeu um convite!</h1>
                                         <span
                                             style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                         <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                            Nós não podemos simplemente mandar sua senha antiga. Um link unico para 
-                                            resetar sua senha foi gerado para você. Para resetar sua senha, entre no link
-                                            e siga as instruções.
+                                            Olá {{nome}}! Você foi convidado para ser um dos primeiros professores do Correction Tool!
+                                            Uma senha foi gerada para você, e você pode acessar o sistema com a mesma. A qualquer momento voce pode
+                                            alterar sua senha.
                                         </p>
-                                        <a href="{{host}}/#/reset_password?token={{token}}&id={{id}}"
-                                            style="background:#ffc400;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Resetar
-                                            Senha</a>
+
+                                        <h4 style="color:#1e1e2d">
+                                            Suas credenciais:
+                                        </h4>
+                                        <div>
+                                            <code style="display: block;">{{email}}</code>
+                                            <code style="display: block;">{{password}}</code>
+                                        </div>
+
+                                        <a href="{{host}}/#/"
+                                            style="background:#ffc400;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Entrar!
+                                            </a>
                                     </td>
                                 </tr>
                                 <tr>

@@ -1,7 +1,12 @@
 <template>
-  <div>
+  <div class="bloco-codigo-wrapper">
     <div class="submissao" :class="{ hover: !disabled }" v-if="disabled">
-      <p v-for="(linha, i) in codigoLinhas" v-html="linha" :key="i" :data-comentario="comentarios[i] && comentarios[i].comentario"/>
+      <p
+        v-for="(linha, i) in codigoLinhas"
+        v-html="linha"
+        :key="i"
+        :data-comentario="comentarios[i] && comentarios[i].comentario"
+      />
     </div>
     <div v-else class="submissao hover">
       <v-dialog v-model="dialog" width="600px">
@@ -64,13 +69,17 @@
         </v-card>
       </v-dialog>
     </div>
+    <a class="download-link"
+      v-if="download && submissao._id"
+      :href="`${clientUrl}/resolucao/${submissao._id}/download`"
+      target="_blank"
+      >Download</a
+    >
   </div>
 </template>
 
 <script>
 import { butify } from "../util/beautifier";
-import ComentarBlocoCodigo from "./modals/ComentarBlocoCodigo";
-import {mapGetters} from 'vuex';
 
 export default {
   data() {
@@ -80,9 +89,6 @@ export default {
       dialog: false,
       linhaIndex: null,
     };
-  },
-  components: {
-    ComentarBlocoCodigo,
   },
   props: {
     codigo: {
@@ -100,9 +106,13 @@ export default {
     comentarios: {
       type: Object,
       default: () => {
-        return {}
+        return {};
       },
-    }
+    },
+    download: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     codigoLinhas() {
@@ -110,19 +120,25 @@ export default {
       let t = html.split(/<br \/>/gm);
       return t;
     },
+    client() {
+      return this.$store.state.comum.client;
+    },
+    clientUrl() {
+      return this.client.fullUrl;
+    },
   },
   methods: {
     comentarLinha(linha) {
       this.$modal.show("comentar-bloco-codigo", { codigo: this.codigo, linha });
     },
     async salvarComentario() {
-      const req = await this.$store.dispatch('professor/salvarComentario', {
+      const req = await this.$store.dispatch("professor/salvarComentario", {
         resolucaoId: this.submissao._id,
         comentario: this.comentario,
         linha: this.linhaIndex,
       });
 
-      if(req.ok){
+      if (req.ok) {
         this.dialog = false;
         this.comentario = "";
       }
@@ -207,6 +223,17 @@ export default {
   }
   p.highlight {
     background-color: #efefef;
+  }
+}
+
+.bloco-codigo-wrapper{
+  position: relative;
+  .download-link {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem;
+    font-size: 13px;
   }
 }
 </style>

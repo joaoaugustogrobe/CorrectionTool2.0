@@ -44,6 +44,7 @@ services:
       RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
       API_ADMIN_EMAIL: ${API_ADMIN_EMAIL:-admin@joaocastilho.com.br}
       API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD:-example}
+      SERVER_NAME: ${NGINX_SERVER_NAME:-joaocastilho.com.br}
     working_dir: /var/www
     command: "npm run dev"
     restart: always

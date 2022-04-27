@@ -1,6 +1,9 @@
 const Professor = require('../models/Professor');
 const SessionController = require('./SessionController');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const Mailer = require('../services/Mailer');
+
 
 const { mapErrors } = require('../Validation/index');
 
@@ -30,9 +33,10 @@ module.exports = {
   },
 
   async store(req, res) {
-    const { email, nome, password } = req.body;
+    const { email, nome } = req.body;
     let professor;
     let token;
+    let password = crypto.randomBytes(10).toString('hex');
 
     try {
       mapErrors(req).throw();
@@ -47,7 +51,15 @@ module.exports = {
         password
       });
 
-      token = SessionController.generateToken({ id: professor._id, role: "professor" });
+      await Mailer.sendMail({
+        to: email,
+        from: '"Correction Tool" <noreply@joaocastilho.com.br>',
+        subject: 'Bem vindo ao Correction Tool!',
+        template: 'professor/invite',
+        context: { email, password, host: process.env.SERVER_NAME, nome },
+      });
+
+      // token = SessionController.generateToken({ id: professor._id, role: "professor" });
       // res.cookie("x-access-token", token);
     }
     catch (e) {

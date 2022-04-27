@@ -364,12 +364,6 @@ schemas['POST/professor/create'] = {
 			options: { min: 3 },
 		},
 	},
-	password: {
-		isLength: {
-			errorMessage: "Password deve conter ao menos 8 caracteres",
-			options: {min: 8}
-		}
-	}
 }
 
 module.exports = schemas;

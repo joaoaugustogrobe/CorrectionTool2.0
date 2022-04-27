@@ -13,24 +13,24 @@
               :rotate="-90"
               :size="100"
               :width="15"
-              :value="30"
+              :value="(materia.lotacao / (materia.capacidade || 1)) * 100"
               color="orange"
             >
-              <span>12/21</span>
+              <span>{{materia.lotacao}}/{{materia.capacidade}}</span>
               <small>alunos</small>
             </v-progress-circular>
           </v-col>
           <v-col cols="8" class="configuracoes-dashboard-detalhes">
             <div class="configuracoes-dashboard-dados">
-              <span class="valor">21</span>
+              <span class="valor">{{materia.lotacao}}</span>
               <span class="chave">alunos</span>
             </div>
             <div class="configuracoes-dashboard-dados">
-              <span class="valor">32</span>
+              <span class="valor">{{materia.capacidade - materia.lotacao}}</span>
               <span class="chave">vagas</span>
             </div>
-            <div class="configuracoes-dashboard-dados">
-              <span class="valor">6</span>
+            <div class="configuracoes-dashboard-dados" v-if="false">
+              <span class="valor">{{materia.exercicios}}</span>
               <span class="chave">exercícios</span>
             </div>
           </v-col>
@@ -54,7 +54,7 @@
               :loading="loading"
             />
           </v-col>
-          <v-col cols="12">
+          <v-col cols="12" v-if="false">
             <ConfiguracaoItem
               v-model="form.senha"
               label="Senha"
@@ -124,7 +124,7 @@ export default {
       return !_.isEqual(this.materia, this.form);
     },
     loading() {
-      return this.$store.state.loading["professor/salvarMateria"];
+      return this.$store.state.loading["comum/salvarMateria"];
     },
   },
   data() {
@@ -134,7 +134,7 @@ export default {
   },
   methods: {
     onSalvar() {
-      this.$store.dispatch("professor/salvarMateria", {
+      this.$store.dispatch("comum/salvarMateria", {
         nome: this.form.nome,
         senha: this.form.senha,
         materiaId: this.form._id,

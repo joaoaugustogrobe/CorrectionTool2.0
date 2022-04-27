@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const Mailer = require('../services/Mailer');
 const bcrypt = require('bcryptjs');
 
-const {mapErrors} = require('../Validation/index');
+const { mapErrors } = require('../Validation/index');
 
 
 module.exports = {
@@ -54,28 +54,31 @@ module.exports = {
 
     try {
       mapErrors(req).throw();
-      const aluno = await Aluno.findOne({ email });
+      const aluno = await Aluno.findOne({ email }).select('+tokenExpiracao');
 
-      const token = crypto.randomBytes(20).toString('hex');
-      let dataExpiracao = new Date();
-      dataExpiracao.setHours(dataExpiracao.getHours() + 1);
+      const agora = new Date();
+      const tokenExpirado = agora > aluno.tokenExpiracao;
+      if (tokenExpirado) {
+        const token = crypto.randomBytes(20).toString('hex');
+        let dataExpiracao = new Date();
+        dataExpiracao.setHours(dataExpiracao.getHours() + 1);
 
-      if (aluno) {
-        await Aluno.findByIdAndUpdate(aluno._id, {
-          '$set': {
-            tokenResetarSenha: token,
-            tokenExpiracao: dataExpiracao,
-          }
-        });
+        if (aluno) {
+          await Aluno.findByIdAndUpdate(aluno._id, {
+            '$set': {
+              tokenResetarSenha: token,
+              tokenExpiracao: dataExpiracao,
+            }
+          });
 
-        const mail = await Mailer.sendMail({
-          to: email,
-          from: 'noreply@joaocastilho.com.br',
-          // template: 'forgot_password',
-          template: 'forgot_password',
-          context: { token, id: aluno._id, host: process.env.NGINX_SERVER_NAME },
-        });
-        console.log('mail', mail);
+          await Mailer.sendMail({
+            to: email,
+            from: '"Correction Tool" <noreply@joaocastilho.com.br>',
+            subject: 'Correction Tool - Recuperação de senha',
+            template: 'forgot_password',
+            context: { token, id: aluno._id, host: process.env.SERVER_NAME },
+          });
+        }
       }
     } catch (e) {
       console.log(e);
@@ -87,23 +90,23 @@ module.exports = {
   },
 
   async redefinirSenha(req, res) {
-    const {alunoId, token, password} = req.body;
-    
+    const { alunoId, token, password } = req.body;
+
     try {
       mapErrors(req).throw();
       let aluno = await Aluno.findById(alunoId).select('+tokenExpiracao +tokenResetarSenha +salt');
-      
-      if(!aluno) throw "Aluno inexistente";
 
-        if(token !== aluno.tokenResetarSenha) throw 'Token inválido';
-        
-        const now = new Date();
-        if(now > aluno.tokenExpiracao) throw 'Token expirado';
-        
-        aluno.password = password + aluno.salt;
-        aluno.tokenExpiracao = '';
-        aluno.tokenResetarSenha = '';
-        await aluno.save();
+      if (!aluno) throw "Aluno inexistente";
+
+      if (token !== aluno.tokenResetarSenha) throw 'Token inválido';
+
+      const now = new Date();
+      if (now > aluno.tokenExpiracao) throw 'Token expirado';
+
+      aluno.password = password + aluno.salt;
+      aluno.tokenExpiracao = '';
+      aluno.tokenResetarSenha = '';
+      await aluno.save();
     } catch (e) {
       return res.status(401).send({ status: "error", message: e && typeof (e) === 'object' && e.array ? e.mapped() : e, data: null });
     }

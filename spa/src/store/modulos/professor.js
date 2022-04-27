@@ -190,33 +190,6 @@ export default {
       }
 
     },
-    async salvarMateria(context, { nome, senha, status, capacidade, materiaId }) {
-      const payload = {
-        materiaId,
-        ...(nome && { nome }),
-        ...(senha && { senha }),
-        ...(capacidade && { capacidade }),
-        ...(status !== undefined && { status }),
-      };
-
-      const req = await context.state.client.post('materia/salvar', payload);
-
-      if (req.ok) {
-        context.commit('guardarMateria', {
-          materiaId,
-          materia: req.data.data.materia
-        });
-        context.commit("core/showMessage", {
-          content: "Matéria salva com sucesso!",
-          error: false,
-        }, { root: true });
-      } else {
-        context.commit("core/showMessage", {
-          content: "Falha ao salvar matéria!",
-          error: true
-        }, { root: true });
-      }
-    },
 
     async atualizarTesteResolucao(context, testeResolucao) {
       const req = await context.state.client.post('testeresolucao/salvar', {testeResolucaoId: testeResolucao._id, isError: testeResolucao.isError});

@@ -21,14 +21,6 @@
       </v-icon>
       <!-- <v-badge v-else-if="item.status === 'nao-entregue'" color="red" /> -->
     </template>
-    <template v-slot:item.resolucaoFilename="{ item }">
-      <a
-        v-if="item.resolucaoFilename"
-        :href="`${clientUrl}/resolucao/${item.resolucaoFilename}/download`"
-        target="_blank"
-        >{{ item.resolucaoFilename }}</a
-      >
-    </template>
     <template v-slot:item.dataSubmissao="{ item }">
       <span v-if="item.dataSubmissao">
         {{ dayjs(dayjs(new Date(parseInt(item.dataSubmissao)))).fromNow() }}

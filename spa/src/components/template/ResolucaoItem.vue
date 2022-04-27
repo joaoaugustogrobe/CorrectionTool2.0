@@ -10,7 +10,11 @@
       <v-card-title>
         <v-row>
           <v-col cols="10">{{ submissao.aluno.nome }}</v-col>
-          <v-col v-if="submissao.corrigido"><v-chip :color="resolucaoNotaTipo">{{ resolucaoNota }}%</v-chip></v-col>
+          <v-col v-if="submissao.corrigido"
+            ><v-chip :color="resolucaoNotaTipo"
+              >{{ resolucaoNota }}%</v-chip
+            ></v-col
+          >
         </v-row>
       </v-card-title>
       <v-card-subtitle>{{ submissao.resolucaoFilename }}</v-card-subtitle>
@@ -26,6 +30,7 @@
         :disabled="isAluno"
         :submissao="submissao"
         :comentarios="comentarios"
+        download
       />
     </v-card>
     <v-card class="mt-5" v-if="submissao && submissao._id">
