@@ -1,17 +1,88 @@
 <template>
-  <div class="submissao" :class="{'hover': !disabled}">
-    <p v-for="(linha, i) in codigoLinhas" v-html="linha" :key="i" />
+  <div>
+    <div class="submissao" :class="{ hover: !disabled }" v-if="disabled">
+      <p v-for="(linha, i) in codigoLinhas" v-html="linha" :key="i" :data-comentario="comentarios[i] && comentarios[i].comentario"/>
+    </div>
+    <div v-else class="submissao hover">
+      <v-dialog v-model="dialog" width="600px">
+        <template v-slot:activator="{ on, attrs }">
+          <div class="submissao">
+            <p
+              v-for="(linha, i) in codigoLinhas"
+              v-html="linha"
+              :key="i"
+              v-on="on"
+              v-bind="attrs"
+              @click="adicionarComentario(i)"
+              :data-comentario="comentarios[i] && comentarios[i].comentario"
+            />
+          </div>
+        </template>
+        <v-card>
+          <v-card-title
+            ><span>{{ submissao.resolucaoFilename }}</span></v-card-title
+          >
+          <v-card-subtitle>
+            <span>{{ submissao.aluno.nome }}</span>
+          </v-card-subtitle>
+          <v-card-text>
+            <div class="submissao">
+              <p
+                v-if="codigoLinhas[linhaIndex - 1]"
+                v-html="codigoLinhas[linhaIndex - 1]"
+              />
+              <p
+                v-html="codigoLinhas[linhaIndex]"
+                class="highlight"
+                :data-comentario="comentario"
+              />
+              <p
+                v-if="codigoLinhas[linhaIndex + 1]"
+                v-html="codigoLinhas[linhaIndex + 1]"
+              />
+            </div>
+
+            <v-form @submit.prevent.stop>
+              <v-container>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="comentario"
+                      label="Comentario"
+                      required
+                      autofocus
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn text @click="dialog = false">Cancel</v-btn>
+            <v-btn text @click="salvarComentario">Submit</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
   </div>
 </template>
 
 <script>
 import { butify } from "../util/beautifier";
+import ComentarBlocoCodigo from "./modals/ComentarBlocoCodigo";
+import {mapGetters} from 'vuex';
 
 export default {
   data() {
     return {
       butify,
+      comentario: "",
+      dialog: false,
+      linhaIndex: null,
     };
+  },
+  components: {
+    ComentarBlocoCodigo,
   },
   props: {
     codigo: {
@@ -22,12 +93,47 @@ export default {
       type: Boolean,
       default: false,
     },
+    submissao: {
+      type: Object,
+      default: () => {},
+    },
+    comentarios: {
+      type: Object,
+      default: () => {
+        return {}
+      },
+    }
   },
   computed: {
     codigoLinhas() {
       let html = this.butify(this.codigo, {});
       let t = html.split(/<br \/>/gm);
       return t;
+    },
+  },
+  methods: {
+    comentarLinha(linha) {
+      this.$modal.show("comentar-bloco-codigo", { codigo: this.codigo, linha });
+    },
+    async salvarComentario() {
+      const req = await this.$store.dispatch('professor/salvarComentario', {
+        resolucaoId: this.submissao._id,
+        comentario: this.comentario,
+        linha: this.linhaIndex,
+      });
+
+      if(req.ok){
+        this.dialog = false;
+        this.comentario = "";
+      }
+    },
+    async adicionarComentario(linhaIndex) {
+      this.dialog = true;
+      this.comentario =
+        (this.comentarios[linhaIndex] &&
+          this.comentarios[linhaIndex].comentario) ||
+        "";
+      this.linhaIndex = linhaIndex;
     },
   },
 };
@@ -82,10 +188,15 @@ export default {
       color: #070;
     }
   }
-  
-  &.hover p:hover{
-      background-color: #efefef;
-      cursor: pointer;
+
+  &.hover p:hover {
+    background-color: #efefef;
+    cursor: pointer;
+  }
+}
+.v-popover {
+  .trigger {
+    width: 100% !important;
   }
 }
 .v-card__text .submissao {

@@ -45,6 +45,10 @@ export default {
         if (this.user) {
           this.autenticado = this.user.role
           this.$store.commit("core/set", {user: this.user});
+          
+          if(this.user.role === 'professor'){
+            this.$store.dispatch('professor/init');
+          }
         }
         else this.autenticado == "convidado";
       }
@@ -57,7 +61,6 @@ export default {
       !this.$router.resolve(this.$router.currentRoute.name)
     )
       this.$router.push("login");
-      this.$store.dispatch('professor/init');
   },
 };
 </script>

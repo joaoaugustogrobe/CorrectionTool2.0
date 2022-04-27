@@ -84,18 +84,17 @@ export default {
     },
     adicionarExercicio(exercicio){
       this.exercicios.unshift(exercicio)
+    },
+    onNovoExercicio(){
+      this.$modal.show('cadastro-exercicio');
     }
   },
   components: {
     "card-exercicio": CardExercicio,
     AdicionarExercicio,
   },
-  methods: {
-    onNovoExercicio(){
-      this.$modal.show('cadastro-exercicio');
-    }
-  },
   created(){
+    console.log('fetch exercicios')
     axios.get(`${backend.uri}/exercicios`).then(res => {
       this.exercicios = res.data.data.exercicios
       this.carregando = false

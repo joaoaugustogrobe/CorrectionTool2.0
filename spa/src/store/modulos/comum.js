@@ -236,7 +236,7 @@ export default {
 			return state.testes[exercicioId] || [];
 		},
 		obterResolucaoTeste: state => resolucaoId => {
-			return state.resolucaoTeste[resolucaoId] || {};
+			return state.resolucaoTeste[resolucaoId] || [];
 		}
 	}
 };

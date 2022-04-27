@@ -16,15 +16,30 @@ module.exports = {
     const { userId, exercicioId, comentarios } = req.body;
     //Validação
     let resolucao, exercicio, prazoDiff, prazoString;
+    let filename, originalname;
     try {
       if (!req.file) throw "É necessario fazer o upload de um arquivo.";
-      const { filename, originalname } = req.file;
+      filename = req.file.filename;
+      originalname = req.file.originalname;
+
+      console.log(req.file);
 
       exercicio = await Exercicio.findById(exercicioId).populate('materia');
       if (!exercicio) throw "Exercício inexistente.";
       if (!exercicio.status) throw "Matéria desabilitada";
 
       const tempPath = path.resolve(req.file.destination);
+
+      //Validar assinatura
+      const file = Storage.read(tempPath, filename);
+      console.log(file);
+      const _space = '[\\s]*';
+      const assinatura = exercicio.assinatura || [];
+      const nomeFuncao = exercicio.nomeFuncao;
+      const _reg = nomeFuncao+_space+'\\('+_space+assinatura.join('[\\s]*,[\\s]*')+_space+'\\)'
+      const assinaturaValida = file.match(new RegExp(_reg, 'g'));
+      console.log(assinaturaValida);
+      if(!assinaturaValida) throw "Assinatura inválida";
 
       const pathDefinitivo = Storage.gerarDiretorio(
         exercicio.materia._id,
@@ -72,8 +87,8 @@ module.exports = {
 
     } catch (e) {
       if (req.file)
-      Storage.deletarArquivo(path.resolve(tempPath, filename));
-      Storage.deletarArquivo(path.resolve(pathDefinitivo, originalname));
+      Storage.deletarArquivo(path.resolve(req.file.destination, filename));
+      // Storage.deletarArquivo(path.resolve(pathDefinitivo, originalname));
 
       return res.status(400).send({ status: "error", message: e, data: null });
     }

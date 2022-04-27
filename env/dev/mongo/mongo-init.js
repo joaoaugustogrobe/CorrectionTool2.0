@@ -18,7 +18,7 @@ db.createCollection('materias');
 db.createCollection('matriculas');
 db.createCollection('professors');
 db.createCollection('resolucaos');
-db.createCollection('testeresolucao');
+db.createCollection('testeresolucaos');
 db.createCollection('testes');
 
 

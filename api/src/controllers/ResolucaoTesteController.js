@@ -50,7 +50,7 @@ module.exports = {
       testes = testes.map(teste => {
         return {
           ...teste,
-          output: role === 'aluno' && teste.isPrivate ? '???' : teste.input,
+          output: role === 'aluno' && teste.isPrivate ? '???' : teste.output,
           input: role === 'aluno' && teste.isPrivate ? teste.input.map(() => '???') : teste.input,
         };
       });

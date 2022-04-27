@@ -73,7 +73,7 @@ module.exports = {
           from: 'noreply@joaocastilho.com.br',
           // template: 'forgot_password',
           template: 'forgot_password',
-          context: { token, id: aluno._id },
+          context: { token, id: aluno._id, host: process.env.NGINX_SERVER_NAME },
         });
         console.log('mail', mail);
       }

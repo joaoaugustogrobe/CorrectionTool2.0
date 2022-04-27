@@ -65,6 +65,9 @@ services:
       - type: bind
         source: ./corretor/temp
         target: /usr/local/Exercicios
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
     # working_dir: /var/www
     command: "npm run dev"
     restart: always

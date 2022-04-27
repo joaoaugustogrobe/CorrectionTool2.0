@@ -19,7 +19,6 @@ module.exports = {
 			fs.unlinkSync(path);
   },
   gerarDiretorio(materiaId, exercicioId, userId) {
-		console.log('gerar diretorio,', materiaId, exercicioId, userId)
     let filePath;
     try {
       filePath = path.resolve(
@@ -37,4 +36,10 @@ module.exports = {
     }
     return filePath;
   },
+
+  read(_path, filename) {
+    const fullPath = path.resolve(_path, filename);
+    console.log('read file', fullPath);
+    return fs.readFileSync(fullPath, 'utf8');
+  }
 };

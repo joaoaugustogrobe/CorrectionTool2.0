@@ -41,7 +41,7 @@
             size="16"
           />
           <v-chip
-            v-else
+            v-else-if="mostrarBanerNovo"
             x-small
             class="float-right mt-3"
             color="yellow"
@@ -62,6 +62,7 @@
           :submissao="submissao"
           :exercicio="exercicio"
           class="mb-3"
+          @novaPagina="onNovaPagina"
         />
         <SubmeterResolucao :exercicio="exercicio" :submissao="submissao"/>
       </template>
@@ -84,6 +85,7 @@ export default {
       materiaId: null,
       exercicioId: null,
       resolucaoPoolingInterval: null,
+      mostrarBanerNovo: false,
     };
   },
   components: {
@@ -112,6 +114,18 @@ export default {
       return true;
     },
   },
+  watch: {
+    submissao(submissao, submissaoAntiga) {
+      if(submissao.status != submissaoAntiga?.status || submissao.corrigido !== submissaoAntiga?.corrigido) {
+        this.mostrarBanerNovo = true;
+      }
+    },
+    pagina(pagina) {
+      if (pagina == "resolucao") {
+        this.mostrarBanerNovo = false;
+      }
+    }
+  },
   methods: {
     async onOpen({ params }) {
       if (params) {
@@ -135,7 +149,6 @@ export default {
       //long pooling of this request, interval of 10 seconds
       this.resolucaoPoolingInterval = setInterval(() => {
         if (this.deveAtualizarResolucao) {
-          console.log("atualizando resolucao");
           this.$store.dispatch("aluno/obterResolucao", this.exercicio._id);
         }
       }, 10000);

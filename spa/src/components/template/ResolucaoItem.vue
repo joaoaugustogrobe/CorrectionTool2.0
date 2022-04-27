@@ -1,15 +1,18 @@
 <template>
   <div>
-    <v-alert
-      dense
-      :type="resolucaoNotaTipo"
-      v-if="submissao && submissao._id && !loading"
-    >
-      <strong>{{ submissao.resolucaoFilename }}</strong>
-      corrigido. Sua nota: {{ resolucaoNota }}
-    </v-alert>
+    <StatusResolucaoAlert
+      v-if="isAluno"
+      :exercicio="exercicio"
+      :resolucao="submissao"
+      @visualizarResolucao="onVisualizarResolucao"
+    />
     <v-card class="mx-auto" v-if="submissao && submissao._id">
-      <v-card-title>{{ submissao.aluno.nome }}</v-card-title>
+      <v-card-title>
+        <v-row>
+          <v-col cols="10">{{ submissao.aluno.nome }}</v-col>
+          <v-col v-if="submissao.corrigido"><v-chip :color="resolucaoNotaTipo">{{ resolucaoNota }}%</v-chip></v-col>
+        </v-row>
+      </v-card-title>
       <v-card-subtitle>{{ submissao.resolucaoFilename }}</v-card-subtitle>
       <v-card-text>
         <div v-if="submissao.comentarios">
@@ -18,7 +21,12 @@
         </div>
       </v-card-text>
       <input type="hidden" name="text_field" id="text_field" value="" />
-      <BlocoDeCodigo :codigo="resolucaoFile" disabled />
+      <BlocoDeCodigo
+        :codigo="resolucaoFile"
+        :disabled="isAluno"
+        :submissao="submissao"
+        :comentarios="comentarios"
+      />
     </v-card>
     <v-card class="mt-5" v-if="submissao && submissao._id">
       <v-card-title>Testes</v-card-title>
@@ -69,14 +77,14 @@
               />
 
               <template v-if="!item.isPrivate">
-                <ConfiguracaoItem
+                <!-- <ConfiguracaoItem
                   v-for="(input, index) in item.input"
                   :key="index"
                   :value="input"
                   textfield
                   readonly
                   :label="`Argumento: ${exercicio.assinatura[index]}`"
-                />
+                /> -->
                 <ConfiguracaoItem
                   :value="item.output"
                   textfield
@@ -128,6 +136,7 @@
 <script>
 import ConfiguracaoItem from "../configuracao/Item.vue";
 import BlocoDeCodigo from "../BlocoDeCodigo.vue";
+import StatusResolucaoAlert from "../modals/Exercicio/StatusResolucaoAlert.vue";
 
 import { butify } from "../../util/beautifier";
 import { mapGetters } from "vuex";
@@ -154,6 +163,7 @@ export default {
   components: {
     ConfiguracaoItem,
     BlocoDeCodigo,
+    StatusResolucaoAlert,
   },
   data() {
     return {
@@ -198,7 +208,7 @@ export default {
       return "newton";
     },
     resolucaoNotaCor() {
-      return this.resolucaoNota >= 60 ? "blue" : "red";
+      return this.resolucaoNota >= 60 ? "green" : "red";
     },
     resolucaoNotaTipo() {
       return this.resolucaoNota >= 60 ? "success" : "warning";
@@ -256,6 +266,9 @@ export default {
         this.baixarFeedback();
         this.obterDadosExecucao();
       }
+    },
+    onVisualizarResolucao() {
+      this.$emit("novaPagina", "resolucao");
     },
     async onResolucaoNotaAlterado(e) {
       await this.$store.dispatch("professor/salvarNota", {

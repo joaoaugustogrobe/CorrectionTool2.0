@@ -96,7 +96,7 @@ export default {
 			if (req.ok) {
 				context.commit('guardarResolucao', {
 					exercicioId,
-					resolucao: {...req.data.resolucao, ...(req.data.resolucao && {timestamp: new Date().getTime()})}
+					resolucao: { ...req.data.resolucao, ...(req.data.resolucao && { timestamp: new Date().getTime() }) }
 				});
 			} else {
 				context.commit("core/showMessage", {
@@ -162,12 +162,22 @@ export default {
 
 		async submeterResolucao(context, payload) {
 			// const {arquivoResolucao, comentarios, exercicioId} = payload;
-			return await context.state.client.postMultipart("resolucao/submit", payload);
+			const req = await context.state.client.postMultipart("resolucao/submit", payload);
+			if (req.ok) {
+				const resolucao = context.getters.obterResolucao(payload.exercicioId);
+				if (resolucao && resolucao._id) {
+					context.commit('guardarResolucao', { 
+						exercicioId: payload.exercicioId, 
+						resolucao: { ...resolucao, status: 'pendente', corrigido: 'false' } 
+					});
+				}
+			}
+			return req;
 		}
 	},
 	getters: {
 		comentarios: state => resolucaoId => {
-			return state.feedbackResolucao[resolucaoId] && state.feedbackResolucao[resolucaoId].comentarios || {};
+			return state.feedbackResolucao[resolucaoId] && state.feedbackResolucao[resolucaoId].comentarios || [];
 		},
 		correcao: state => resolucaoId => {
 			return state.feedbackResolucao[resolucaoId] && state.feedbackResolucao[resolucaoId].correcao || {};

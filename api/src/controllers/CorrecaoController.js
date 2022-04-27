@@ -42,6 +42,7 @@ module.exports = {
       if (await user.cannot("correcao/criar", { resolucaoId })) throw "Permissão insuficiente";
 
       let correcao = await Correcao.findOne({ resolucao: resolucaoId });
+      let resolucao = await Resolucao.findById(resolucaoId);
       if (correcao) {
         correcao.notaCorrecao = nota;
         await correcao.save();
@@ -56,9 +57,6 @@ module.exports = {
           exercicio,
         });
       }
-
-      let resolucao = await Resolucao.findById(resolucaoId);
-      
       resolucao.corrigido = true;
       await resolucao.save();
 

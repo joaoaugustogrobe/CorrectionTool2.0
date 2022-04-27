@@ -8,7 +8,7 @@
     <v-card-text>
       <v-row>
         <v-col>
-          <v-form :ref="`form-${exercicio._id}`">
+          <v-form :ref="`form-${exercicio._id}`" v-model="formValido">
             <ConfiguracaoItem
               label="Comentários"
               descricao="Insira comentários para o professor"
@@ -22,11 +22,10 @@
             </ConfiguracaoItem>
             <ConfiguracaoItem label="Submissão">
               <v-file-input
-                accept=".m"
                 :label="`${exercicio.nomeFuncao}.m`"
                 v-model="form.file"
                 class="pt-2"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.fileSize]"
                 outlined
                 dense
               />
@@ -45,7 +44,7 @@
           v-if="submissao._id"
         >
           <template v-slot:activator="{ on }">
-            <v-btn outlined color="green" v-on="on">
+            <v-btn outlined color="green" v-on="on" :disabled="!formValido">
               <span>Enviar</span>
             </v-btn>
           </template>
@@ -88,6 +87,7 @@ export default {
         comentarios: "",
         file: null,
       },
+      formValido: false,
     };
   },
   components: {
@@ -113,9 +113,15 @@ export default {
         });
         if(req.ok){
           this.dialogConfirmacao = false;
-          this.$toast.success("Resolução submetida com sucesso!");
+          this.$store.commit("core/showMessage", {
+            content: "Resolução submetida com sucesso!",
+            error: false,
+          });
         }else{
-          this.$toast.error("Erro ao submeter resolução!");
+          this.$store.commit("core/showMessage", {
+            content: "Erro ao submeter resolução.",
+            error: true,
+          });
         }
 
       } else this.dialogConfirmacao = false;

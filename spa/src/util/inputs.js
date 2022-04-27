@@ -14,6 +14,12 @@ export const inputMixin = {
 				},
 				senhasIguais: (senha1, senha2) => senha1 === senha2 || "As senhas devem ser iguais.",
 				email: v => /.+@.+\..+/.test(v) || "E-mail inválido",
+				fileSize: files => {
+					if (!files) return "Arquivo inválido";
+					const file = files.length ? files[0] : files;
+					const size = file.size / 1024 / 1024;
+					return size <= 1 || `Arquivo muito grande. Tamanho máximo: 1MB. Tamanho atual: ${size.toFixed(2)}MB`;
+				}
 			},
 		}
 	}

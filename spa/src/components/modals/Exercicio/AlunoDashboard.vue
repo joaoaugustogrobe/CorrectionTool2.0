@@ -1,76 +1,7 @@
 <template>
   <v-container class="my-5">
     <v-flex>
-      <v-row v-if="resolucao" class="pb-1">
-        <v-col class="py-0">
-          <v-alert
-            dense
-            type="secondary"
-            v-if="exercicio && resolucao && resolucao.status === 'pendente'"
-          >
-            <strong>{{ resolucao.resolucaoFilename }}</strong>
-            adicionado a fila de execução.
-          </v-alert>
-          <v-alert
-            dense
-            type="success"
-            close-icon="d-flex align-items-center"
-            v-else-if="
-              exercicio &&
-              resolucao &&
-              resolucao.status === 'ok' &&
-              resolucao.corrigido
-            "
-          >
-            Correção para
-            <strong>{{ resolucao.resolucaoFilename }}</strong>
-            esta pronta.
-
-            <v-btn
-              name="append"
-              class="float-right"
-              outlined
-              small
-              @click="onVisualizarResolucao"
-              >Visualizar</v-btn
-            >
-            <v-progress-circular
-              v-if="buscandoResolucao"
-              indeterminate
-              color="gray"
-              class="mr-4 mt-1 float-right"
-              size="20"
-            />
-
-            <small class="float-right pt-1 pr-4" v-else>{{
-              dataRelativa(resolucao.timestamp)
-            }}</small>
-          </v-alert>
-          <v-alert
-            dense
-            type="success"
-            @click="onVisualizarResolucao"
-            v-else-if="
-              exercicio &&
-              resolucao &&
-              resolucao.status === 'ok' &&
-              !resolucao.corrigido
-            "
-          >
-            Detalhes sobre a execução de
-            <strong>{{ resolucao.resolucaoFilename }}</strong>
-            estão disponiveis.
-            <v-btn
-              name="append"
-              class="float-right"
-              outlined
-              small
-              @click="onVisualizarResolucao"
-              >Visualizar</v-btn
-            >
-          </v-alert>
-        </v-col>
-      </v-row>
+      <StatusResolucaoAlert :exercicio="exercicio" :resolucao="resolucao" @visualizarResolucao="onVisualizarResolucao"/>
       <v-card>
         <v-card-title
           >{{ exercicio.titulo }} · {{ assinaturaFuncao }}</v-card-title
@@ -197,12 +128,14 @@ import { mapGetters } from "vuex";
 
 import ConfiguracaoItem from "../../configuracao/Item.vue";
 import BlocoDeCodigo from "../../../components/BlocoDeCodigo.vue";
+import StatusResolucaoAlert from "./StatusResolucaoAlert.vue";
 
 export default {
   mixins: [dataMixin],
   components: {
     ConfiguracaoItem,
     BlocoDeCodigo,
+    StatusResolucaoAlert,
   },
   data: () => {
     return {
