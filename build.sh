@@ -35,6 +35,10 @@ mkdir -p temp
 cd ..
 
 echo
+echo '### CREATING LOG FOLDERS ###'
+mkdir -p logs/p_mongo/
+
+echo
 echo '### MOVE BUILD FOLDER ###'
 mkdir -p env/prod/spa/dist/build
 cp -rf spa/dist/* env/prod/spa/dist/build

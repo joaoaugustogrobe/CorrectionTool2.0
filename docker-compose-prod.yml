@@ -138,10 +138,14 @@ services:
         source: ./env/prod/mongo/mongo-init.js
         target: /docker-entrypoint-initdb.d/mongo-init.js
       - p_mongodata:/data/db #Helps to store MongoDB data in `./mongo/data`
-      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
-      #- ./env/dev/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js:ro
+      - type: bind
+        source: ./logs/p_mongo/
+        target: /var/log/mongod.log
     ports:
       - 27017:27017
+    command: 
+      - '--logpath'
+      - '/var/log/mongodb/mongod.log'
 
 volumes:
   p_mongodata:
