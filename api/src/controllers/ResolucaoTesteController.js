@@ -23,9 +23,12 @@ module.exports = {
     try {
       const permissao = await user.can("resolucao/obter", { resolucaoId });
       if (!permissao) throw "Permissão insuficiente";
-      console.log('obtendo testes')
+
+      const resolucao = await Resolucao.findById(resolucaoId);
+
       let testes = await TesteResolucao.aggregate([
         { $match: { 'resolucao': ObjectId(resolucaoId) } },
+        { $match: { 'versao': resolucao.tentativas } },
         { $sort: { 'updatedAt': 1 } },
         {
           $group: {
@@ -42,6 +45,8 @@ module.exports = {
             'isPrivate': '$teste.isPrivate',
             'nome': '$teste.nome',
             'output': '$teste.output',
+            'mensagemErro': '$teste.mensagemErro',
+            'versao': '$testeresolucao.versao',
           }
         },
         { $project: { teste: 0 } }

@@ -23,6 +23,10 @@ export default {
 
 			Vue.set(state.feedbackResolucao, resolucaoId, feedback);
 		},
+		apagarFeedback: (state, payload) => {
+			const {resolucaoId } = payload;
+			Vue.delete(state.feedbackResolucao, resolucaoId);
+		},
 		salvarComentario: (state, payload) => {
 			const { comentario, resolucaoId, linha } = payload;
 

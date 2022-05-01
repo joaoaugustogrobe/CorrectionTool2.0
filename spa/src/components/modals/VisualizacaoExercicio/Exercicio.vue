@@ -6,6 +6,8 @@
     @before-open="onOpen"
     @before-close="onClose"
   >
+    <FeedbackResolucaoAluno :exercicio="exercicio" :submissao="submissao"/>
+
     <template v-slot:tabs>
       <ul>
         <li class="item-title">
@@ -64,7 +66,7 @@
           class="mb-3"
           @novaPagina="onNovaPagina"
         />
-        <SubmeterResolucao :exercicio="exercicio" :submissao="submissao"/>
+        <SubmeterResolucao :exercicio="exercicio" :submissao="submissao" v-if="!submissao.corrigido"/>
       </template>
     </template>
   </Modal>

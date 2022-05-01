@@ -28,6 +28,7 @@
       </div>
     </v-flex>
     <VisualizarExercicio />
+    <FeedbackResolucaoAluno />
   </v-container>
 </template>
 
@@ -35,6 +36,7 @@
 import { mapGetters } from "vuex";
 import dataMixin from "../../../util/date";
 import VisualizarExercicio from "../../modals/VisualizacaoExercicio/Exercicio.vue";
+import FeedbackResolucaoAluno from "../../modals/FeedbackResolucaoAluno.vue";
 
 
 
@@ -42,6 +44,7 @@ export default {
   mixins: [dataMixin],
   components: {
     VisualizarExercicio,
+    FeedbackResolucaoAluno,
   },
   computed: {
     ...mapGetters("comum", ["obterMateria"]),

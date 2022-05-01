@@ -3,37 +3,37 @@
     <StatusResolucaoAlert
       v-if="isAluno"
       :exercicio="exercicio"
-      :resolucao="submissao"
-      @visualizarResolucao="onVisualizarResolucao"
+      :resolucao="resolucao"
+      @visualizarResolucao="onVisualizarSubmissao"
     />
-    <v-card class="mx-auto" v-if="submissao && submissao._id">
+    <v-card class="mx-auto" v-if="resolucao && resolucao._id && !loading">
       <v-card-title>
         <v-row>
-          <v-col cols="10">{{ submissao.aluno.nome }}</v-col>
-          <v-col v-if="submissao.corrigido"
-            ><v-chip :color="resolucaoNotaTipo"
-              >{{ resolucaoNota }}%</v-chip
+          <v-col cols="10">{{ resolucao.aluno.nome }}</v-col>
+          <v-col v-if="resolucao.status == 'ok'" cols="2">
+            <v-chip :color="resolucaoNotaTipo"
+              >{{ resolucao.nota }}%</v-chip
             ></v-col
           >
         </v-row>
       </v-card-title>
-      <v-card-subtitle>{{ submissao.resolucaoFilename }}</v-card-subtitle>
+      <v-card-subtitle>{{ resolucao.resolucaoFilename }}</v-card-subtitle>
       <v-card-text>
-        <div v-if="submissao.comentarios">
+        <div v-if="resolucao.comentarios">
           <h3>Comentários do aluno:</h3>
-          <span>{{ submissao.comentarios }}</span>
+          <span>{{ resolucao.comentarios }}</span>
         </div>
       </v-card-text>
       <input type="hidden" name="text_field" id="text_field" value="" />
       <BlocoDeCodigo
         :codigo="resolucaoFile"
         :disabled="isAluno"
-        :submissao="submissao"
+        :submissao="resolucao"
         :comentarios="comentarios"
         download
       />
     </v-card>
-    <v-card class="mt-5" v-if="submissao && submissao._id">
+    <v-card class="mt-5" v-if="resolucao && resolucao._id && !loading">
       <v-card-title>Testes</v-card-title>
       <v-data-table
         :headers="testeHeaders"
@@ -74,14 +74,43 @@
                 >
               </div>
               <h4>{{ item.nome }}</h4>
-              <h5 v-if="item.isError">{{ item.mensagemErro }}</h5>
+              <h5 v-if="item.testeresolucao.isError">
+                {{ item.mensagemErro }}
+              </h5>
               <BlocoDeCodigo
                 :codigo="assinaturaTeste(item)"
                 disabled
                 class="my-4"
               />
 
-              <template v-if="!item.isPrivate">
+              <ConfiguracaoItem
+                v-if="isProfessor"
+                :key="testeExpandidos.length"
+                v-model="item.testeresolucao.isError"
+                class="mb-4"
+                label="Teste falhou"
+                descricao="O teste é considerado como falho quando a resposta do aluno é diferente da resposta do professor."
+                @input="() => alterarEstadoTeste(item)"
+              >
+                <v-btn
+                  outlined
+                  small
+                  class="float-right"
+                  v-if="item.testeresolucao.isError"
+                  @click="() => mudarEstadoTeste(item)"
+                  >Mudar para ACERTO</v-btn
+                >
+                <v-btn
+                  outlined
+                  small
+                  class="float-right"
+                  v-else
+                  @click="() => mudarEstadoTeste(item)"
+                  >Mudar para ERRO</v-btn
+                >
+              </ConfiguracaoItem>
+
+              <template v-if="!item.isPrivate || isProfessor">
                 <!-- <ConfiguracaoItem
                   v-for="(input, index) in item.input"
                   :key="index"
@@ -114,10 +143,10 @@
       <div class="avaliacao px-3 mt-4">
         <div class="d-flex justify-space-between">
           <span>Resolução do aluno</span>
-          <small>{{ resolucaoNota }}%</small>
+          <small>{{ submissao.nota }}%</small>
         </div>
         <v-slider
-          v-model="resolucaoNota"
+          v-model="submissao.nota"
           :thumb-color="resolucaoNotaCor"
           thumb-label
           :disabled="isAluno"
@@ -173,7 +202,6 @@ export default {
   data() {
     return {
       resolucaoFile: "",
-      resolucaoNota: 0,
       dialog: false,
       linhaIndex: null,
       comentarioValido: true,
@@ -196,8 +224,8 @@ export default {
     comentarios() {
       return this.obterComentarios(this.submissao._id);
     },
-    correcao() {
-      return this.$store.getters["comum/correcao"](this.submissao._id);
+    resolucao() {
+      return this.submissao;
     },
     resolucaoLinhas() {
       let html = this.butify(this.resolucaoFile, {});
@@ -207,21 +235,22 @@ export default {
       return t;
     },
     resolucaoTestes() {
-      return this.obterResolucaoTeste(this.submissao._id);
+      return this.obterResolucaoTeste(this.resolucao._id);
     },
     nomeExercicio() {
       return "newton";
     },
     resolucaoNotaCor() {
-      return this.resolucaoNota >= 60 ? "green" : "red";
+      return this.resolucao.nota >= 60 ? "green" : "red";
     },
     resolucaoNotaTipo() {
-      return this.resolucaoNota >= 60 ? "success" : "warning";
+      return this.resolucao.nota >= 60 ? "success" : "warning";
     },
     loading() {
       return (
         this.$store.state.loading["comum/downloadSubmissao"] ||
-        this.$store.state.loading["comum/downloadFeedback"]
+        this.$store.state.loading["comum/downloadFeedback"] ||
+        this.$store.state.loading["aluno/submeterResolucao"]
       );
     },
     testeHeaders() {
@@ -257,11 +286,18 @@ export default {
     },
   },
   watch: {
-    correcao: {
+    resolucao: {
       deep: true,
-      handler(correcao) {
-        this.resolucaoNota = correcao.notaCorrecao;
+      handler(resolucao, oldresolucao) {
+        if (resolucao.tentativas !== oldresolucao.tentativas) {
+          this.init();
+        }
       },
+    },
+    submeterResolucao(submetendo) {
+      if (submetendo) {
+        this.resolucaoFile = "";
+      }
     },
   },
   methods: {
@@ -272,8 +308,21 @@ export default {
         this.obterDadosExecucao();
       }
     },
-    onVisualizarResolucao() {
-      this.$emit("novaPagina", "resolucao");
+    onVisualizarSubmissao() {
+      this.$modal.show("feedback-resolucao-aluno", {
+        exercicio: this.exercicio,
+      });
+    },
+    async mudarEstadoTeste(teste) {
+      await this.$store.dispatch("professor/atualizarTesteResolucao", {
+        id: teste.testeresolucao._id,
+        isError: !teste.testeresolucao.isError,
+      });
+      this.obterDadosExecucao();
+      this.obterSubmissao();
+    },
+    obterSubmissao(){
+      this.$store.dispatch("aluno/obterResolucao", this.exercicio._id);
     },
     async onResolucaoNotaAlterado(e) {
       await this.$store.dispatch("professor/salvarNota", {

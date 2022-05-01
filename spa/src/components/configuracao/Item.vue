@@ -31,6 +31,7 @@
       </div>
       <v-switch
         v-if="hasSwitch"
+        :key="counter"
         :id="id"
         :loading="loading"
         @change="(e) => $emit('input', !!e)"
@@ -38,6 +39,16 @@
         :disabled="disabled"
         :readonly="readonly"
       ></v-switch>
+      <input type="checkbox"
+        v-if="hasCheckbox"
+        :key="counter"
+        :id="id"
+        :loading="loading"
+        @change="(e) => $emit('input', !!e)"
+        :value="value"
+        :disabled="disabled"
+        :readonly="readonly"
+      />
     </div>
   </div>
 </template>
@@ -60,6 +71,10 @@ export default {
       default: false,
     },
     hasSwitch: {
+      type: Boolean,
+      default: false,
+    },
+    hasCheckbox: {
       type: Boolean,
       default: false,
     },
@@ -87,8 +102,15 @@ export default {
   data() {
     return {
       id: uuid(),
+      counter: 0,
     };
   },
+  mounted() {
+    this.counter++;
+    this.$nextTick(() => {
+      this.counter++;
+    });
+  }
 };
 </script>
 

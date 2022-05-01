@@ -17,8 +17,7 @@
         v-else-if="
           exercicio &&
           resolucao &&
-          resolucao.status === 'ok' &&
-          resolucao.corrigido
+          resolucao.status === 'ok'
         "
       >
         Correção para
@@ -41,7 +40,7 @@
           size="20"
         />
       </v-alert>
-      <v-alert
+      <!-- <v-alert
         dense
         type="success"
         color="grey darken-3"
@@ -64,7 +63,7 @@
           @click="onVisualizarResolucao"
           >Visualizar</v-btn
         >
-      </v-alert>
+      </v-alert> -->
     </v-col>
   </v-row>
 </template>

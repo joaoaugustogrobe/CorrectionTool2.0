@@ -162,15 +162,28 @@ export default {
 
 		async submeterResolucao(context, payload) {
 			// const {arquivoResolucao, comentarios, exercicioId} = payload;
+
+			//Apagar dados de resolucao antigos
+			let resolucao = context.getters.obterResolucao(payload.exercicioId);
+			if (resolucao && resolucao._id) {
+				context.commit('comum/apagarFeedback', { resolucaoId: resolucao._id }, { root: true });
+				context.commit('comum/guardarResolucaoTeste', {
+					resolucaoId: resolucao._id,
+					testes: [],
+				}, { root: true });
+			}
+
 			const req = await context.state.client.postMultipart("resolucao/submit", payload);
+			resolucao = context.getters.obterResolucao(payload.exercicioId);
 			if (req.ok) {
-				const resolucao = context.getters.obterResolucao(payload.exercicioId);
 				if (resolucao && resolucao._id) {
-					context.commit('guardarResolucao', { 
-						exercicioId: payload.exercicioId, 
-						resolucao: { ...resolucao, status: 'pendente', corrigido: 'false' } 
+					context.commit('guardarResolucao', {
+						exercicioId: payload.exercicioId,
+						resolucao: { ...resolucao, status: 'pendente', corrigido: 'false' }
 					});
 				}
+
+
 			}
 			return req;
 		}

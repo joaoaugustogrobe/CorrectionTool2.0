@@ -4,7 +4,7 @@
     <!-- <adicionar-exercicio :adicionarCallback="adicionarExercicio"/> -->
 
     <v-container class="my-5">
-      <v-layout row class="mb-3">
+      <v-layout row class="mb-3" v-if="false">
         <v-btn small text color="grey" @click="ordenar('descricao')">
           <v-icon>home_work</v-icon>
           <span class="caption">Ordenar por exercicio</span>

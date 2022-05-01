@@ -191,8 +191,8 @@ export default {
 
     },
 
-    async atualizarTesteResolucao(context, testeResolucao) {
-      const req = await context.state.client.post('testeresolucao/salvar', {testeResolucaoId: testeResolucao._id, isError: testeResolucao.isError});
+    async atualizarTesteResolucao(context, {id, isError}) {
+      const req = await context.state.client.post('testeresolucao/salvar', {testeResolucaoId: id, isError});
 
       if (req.ok) {
         context.dispatch('obterDadosExecucao', req.data.data.testeResolucao.resolucao)

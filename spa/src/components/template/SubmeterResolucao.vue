@@ -117,6 +117,9 @@ export default {
             content: "Resolução submetida com sucesso!",
             error: false,
           });
+          this.limparForm();
+
+          this.$modal.show("feedback-resolucao-aluno", { exercicio: this.exercicio });
         }else{
           this.$store.commit("core/showMessage", {
             content: "Erro ao submeter resolução.",
@@ -126,6 +129,10 @@ export default {
 
       } else this.dialogConfirmacao = false;
     },
+    limparForm() {
+      this.form.comentarios = "";
+      this.form.file = null;
+    }
   },
   computed: {
     assinaturaFuncao() {

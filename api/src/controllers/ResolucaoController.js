@@ -1,6 +1,8 @@
 const Resolucao = require("../models/Resolucao");
 const Exercicio = require("../models/Exercicio");
 const Teste = require("../models/Teste");
+const Correcao = require("../models/Correcao");
+const Comentario = require("../models/Comentario");
 const FileController = require("./FileController")
 const DockerController = require("../controllers/DockerController")
 const MQProducer = require('../kafkaproducer');
@@ -22,8 +24,6 @@ module.exports = {
       filename = req.file.filename;
       originalname = req.file.originalname;
 
-      console.log(req.file);
-
       exercicio = await Exercicio.findById(exercicioId).populate('materia');
       if (!exercicio) throw "Exercício inexistente.";
       if (!exercicio.status) throw "Matéria desabilitada";
@@ -32,13 +32,11 @@ module.exports = {
 
       //Validar assinatura
       const file = Storage.read(tempPath, filename);
-      console.log(file);
       const _space = '[\\s]*';
       const assinatura = exercicio.assinatura || [];
       const nomeFuncao = exercicio.nomeFuncao;
       const _reg = nomeFuncao+_space+'\\('+_space+assinatura.join('[\\s]*,[\\s]*')+_space+'\\)'
       const assinaturaValida = file.match(new RegExp(_reg, 'g'));
-      console.log(assinaturaValida);
       if(!assinaturaValida) throw "Assinatura inválida";
 
       const pathDefinitivo = Storage.gerarDiretorio(
@@ -61,6 +59,12 @@ module.exports = {
       });
 
       if (resolucao) {
+        const feedbackProfessor = await Correcao.findOne({resolucao: resolucao._id});
+        console.log(feedbackProfessor)
+        const comentariosProfessor = await Comentario.findOne({resolucao: resolucao._id});
+        console.log(comentariosProfessor)
+        if(feedbackProfessor || comentariosProfessor) throw "Resolução já corrigida.";
+
         resolucao.tentativas++;
         console.log('corrigindo resolucao, tentativas:', resolucao.tentativas);
         resolucao.dataSubmissao = Date.now();
@@ -133,30 +137,6 @@ module.exports = {
           '$set': {
             'comentarios': {
               '$size': '$comentarios'
-            }
-          }
-        }, {
-          '$lookup': {
-            'from': 'correcaos',
-            'localField': '_id',
-            'foreignField': 'resolucao',
-            'as': 'nota'
-          }
-        }, {
-          '$unwind': {
-            'path': '$nota',
-            'preserveNullAndEmptyArrays': true
-          }
-        }, {
-          '$set': {
-            'nota': '$nota.notaCorrecao'
-          }
-        }, {
-          '$set': {
-            'nota': {
-              '$ifNull': [
-                '$nota', 0
-              ]
             }
           }
         }, {
@@ -275,54 +255,10 @@ async function prepararCorrecao(resolucao) {
         ext: '.m',
       }));
     })
-    // testes.forEach(teste => {
-
-    //   DockerController.executarOperacao({
-    //     teste,
-    //     aluno: resolucao.aluno,
-    //     materia: teste.exercicio.materia,
-    //     exercicio: teste.exercicio._id
-    //   })
-    // })
 
   } catch (error) {
     console.error(error)
     throw error
   }
   return json
-}
-
-
-async function JSONFactory(testes, resolucao, operacao) {
-  let materia = testes[0].exercicio.materia;
-  let exercicio = testes[0].exercicio._id;
-  let aluno = resolucao.aluno;
-
-  let _parametroEntrada = {
-    id: { aluno, materia, exercicio },
-    operacao
-  }
-
-
-  if (operacao === 'comparar') {
-    _parametroEntrada.parametros = [
-      FileController.resolvePathInputs(materia, exercicio, testes),
-      FileController.resolvePathOutput(materia, exercicio, aluno)
-    ]
-
-  } else if (operacao === 'executar') {
-    _parametroEntrada.parametros = [
-      FileController.resolvePathExercicio(materia, exercicio, aluno, resolucao.resolucaoFilename),
-      FileController.resolvePathInputs(materia, exercicio, testes),
-      FileController.resolvePathOutput(materia, exercicio, aluno)
-    ]
-  } else {
-    throw "Operação indisponivel"
-  }
-
-  return _parametroEntrada
-
-  //Esta parte estava criando o arquivo JSON. não necessario de acordo com mudanças de projeto
-  //let pathJson = await FileController.resolvePathJson(materia, exercicio, aluno, _parametroEntrada)
-  //return [pathJson, _parametroEntrada]
 }

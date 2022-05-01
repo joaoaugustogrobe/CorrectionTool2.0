@@ -48,6 +48,16 @@ const resolucaoSchema = new mongoose.Schema({
         required: false,
         default: '',
     },
+    nota: {
+        type: Number,
+        default: 0,
+        validate: {
+            validator: function (v) {
+                return v >= 0 && v <= 100;
+            },
+            message: props => `${props.value} nota inválida.`
+        }
+    }
 }, { timestamps: true });
 
 

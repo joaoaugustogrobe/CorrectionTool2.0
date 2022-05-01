@@ -8,8 +8,8 @@
     :class="className"
     class="left-tabbed-modal"
     v-bind="{ ...$props, ...$attrs }"
-    width="1000px"
-    height="95%"
+    :width="className === 'small' ? '650px' : '1000px'"
+    :height="className === 'small' ? '50%' : '95%'"
   >
     <div class="modal-tabs" v-if="!isMobile && hasTabs">
       <slot name="tabs"></slot>
@@ -224,6 +224,14 @@ export default {
           }
         }
       }
+    }
+  }
+
+  &.small .vm--modal {
+    height: 50vh !important;
+    width: 650px !important;
+    .modal-body-wrapper.no-tabs {
+      width: 650px;
     }
   }
 }

@@ -2,6 +2,7 @@ const Exercicio = require('../models/Exercicio');
 const Teste = require('../models/Teste');
 const Resolucao = require('../models/Resolucao');
 const TesteResolucao = require('../models/TesteResolucao');
+const Difference = require('./Difference');
 
 module.exports = {
   //Executado pelo broker após executar um exercicio
@@ -12,12 +13,14 @@ module.exports = {
     // const _output = parseOutput(payload.output);
 
     try {
-      const index = output.indexOf("ans =");
-      const isError = index === -1;
+      const _teste = await Teste.findById(teste);
+      if(!_teste) throw e;
+
+      const isError = Difference.diff(_teste.output, output);
       let res = await TesteResolucao.create({
         resolucao,
         teste,
-        output: isError ? output : output.slice(index),
+        output,
         aluno,
         exercicio,
         isError: isError,
@@ -33,16 +36,17 @@ module.exports = {
       if (!resolucaoObj) throw 'Resolução inexistente';
 
 
-
       //Verifica se existem outras correções do mesmo exercicio sendo executadas
       const testesExercicio = await Teste.find({ exercicio });
       const resolucoesExercicio = await TesteResolucao.find({ resolucao, versao });
 
       if (resolucoesExercicio.length === testesExercicio.length) {
+        const accurateTests = resolucoesExercicio.filter(resolucao => !resolucao.isError);
+        
         resolucaoObj.status = 'ok';
+        resolucaoObj.nota = (accurateTests.length / resolucoesExercicio.length * 100).toFixed(1);
         await resolucaoObj.save();
       }
-
 
       console.log(`[INFO] - Correção registrada. ${resolucoesExercicio.length}/${testesExercicio.length}`);
 

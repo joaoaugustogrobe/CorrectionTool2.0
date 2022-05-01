@@ -1,4 +1,5 @@
 const TesteResolucao = require('../models/TesteResolucao');
+const Resolucao = require('../models/Resolucao');
 
 const { mapErrors } = require('../Validation/index');
 
@@ -9,12 +10,19 @@ module.exports = {
         try {
             mapErrors(req).throw();
             if (await user.cannot("testeresolucao/salvar", { testeResolucaoId })) throw "Permissão insuficiente";
-            console.log(2)
             testeResolucao = await TesteResolucao.findById(testeResolucaoId);
             testeResolucao.isError = isError;
-            console.log(testeResolucao)
             await testeResolucao.save();
-            console.log(4)
+
+            const resolucao = await Resolucao.findById(testeResolucao.resolucao);
+            if(!resolucao.corrigido) { // calcular nota novamente
+                const resolucoesExercicio = await TesteResolucao.find({ resolucao, versao: testeResolucao.versao });
+                const testesCorretos = resolucoesExercicio.filter(resolucao => !resolucao.isError);
+        
+                resolucao.status = 'ok';
+                resolucao.nota = (testesCorretos.length / resolucoesExercicio.length * 100).toFixed(1);
+                await resolucao.save();
+            }
 
 
         } catch (e) {

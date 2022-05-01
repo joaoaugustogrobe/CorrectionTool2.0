@@ -37,26 +37,10 @@ module.exports = {
     const { resolucaoId } = req.params;
 
     try {
-
       if (await user.cannot("resolucao/obter", { resolucaoId })) throw "Permissão insuficiente";
-      if (await user.cannot("correcao/criar", { resolucaoId })) throw "Permissão insuficiente";
 
-      let correcao = await Correcao.findOne({ resolucao: resolucaoId });
       let resolucao = await Resolucao.findById(resolucaoId);
-      if (correcao) {
-        correcao.notaCorrecao = nota;
-        await correcao.save();
-      } else {
-        const exercicio = resolucao.exercicio;
-        const aluno = resolucao.aluno;
-
-        correcao = await Correcao.create({
-          resolucao: resolucaoId,
-          notaCorrecao: nota,
-          aluno,
-          exercicio,
-        });
-      }
+      resolucao.nota = nota;
       resolucao.corrigido = true;
       await resolucao.save();
 
@@ -66,7 +50,7 @@ module.exports = {
     return res.status(200).send({
       status: "success",
       message: "Nota salva com sucesso",
-      data: {}
+      data: { resolucao },
     });
   },
 
@@ -74,7 +58,6 @@ module.exports = {
   async salvarFeedbackLinha(req, res) {
     const { user, comentario, linha } = req.body;
     const { resolucaoId } = req.params;
-
 
     try {
 
@@ -124,12 +107,12 @@ module.exports = {
       if (await user.cannot("correcao/obter", { resolucaoId })) throw "Permissão insuficiente";
 
       const comentarios = await Comentario.find({ resolucao: resolucaoId });
-      let correcao = await Correcao.findOne({ resolucao: resolucaoId }) || {};
+      // let correcao = await Correcao.findOne({ resolucao: resolucaoId }) || {};
 
       return res.status(200).send({
         status: "success",
         message: "Notas obtidas",
-        data: { comentarios, correcao }
+        data: { comentarios }
       });
 
     } catch (e) {
