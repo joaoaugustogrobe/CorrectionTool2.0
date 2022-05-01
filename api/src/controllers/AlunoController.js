@@ -16,10 +16,10 @@ module.exports = {
     let aluno;
     try {
       aluno = await Aluno.findOne({ email }).select('+salt +password');
-
-      if (!aluno) throw { status: "error", message: "Usuario ou senha incorretos.", data: null }
+      console.log(aluno);
+      if (!aluno) throw "Usuario ou senha incorretos.";
     } catch (e) {
-      throw { status: "error", message: "Usuario ou senha incorretos.", data: null }
+      return res.status(401).send({ status: "error", message: e && typeof (e) === 'object' && e.array ? e.mapped() : e, data: null });
     }
     if (!bcrypt.compareSync(`${password}${aluno.salt}`, aluno.password))
       return res.status(401).send({ status: "error", message: "Usuario ou senha incorretos.", data: null });
