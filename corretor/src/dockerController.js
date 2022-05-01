@@ -32,8 +32,6 @@ class DockerClient {
 
 			var docker = this.docker;
 
-			octave --eval soma(1,1) -p /usr/local/algoritmos -q
-
 			docker.run(
 				'mtmiller/octave:latest',
 				["octave", "--eval", `${nomeFuncao}(${input.join(',')})`, "-p", `/usr/local/Exercicios/${materia}/${exercicio}/${aluno}`, "-q"],
