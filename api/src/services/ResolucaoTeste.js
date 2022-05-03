@@ -51,7 +51,7 @@ module.exports = {
 
       console.log(`[INFO] - Correção registrada. ${resolucoesExercicio.length}/${testesExercicio.length}`);
 
-      LogExecucao.create({...meta, testeResolucao: res._id});
+      LogExecucao.create({...meta, resolucao: resolucaoObj, exercicio: exercicioObj});
 
     } catch (e) {
       console.error(e);

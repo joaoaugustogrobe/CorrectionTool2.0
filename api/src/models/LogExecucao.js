@@ -21,11 +21,6 @@ const logExecucao = new mongoose.Schema({
         type: String,
         required: true,
     },
-    testeResolucao: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Materia',
-        required: true,
-    },
 });
 
 
