@@ -13,7 +13,7 @@ db.createUser(
   {
     user: "readonly",
     pwd: _getEnv("MONGO_READONLY_PASSWORD"),
-    roles: [{ role: 'readWrite', db: _getEnv("MONGO_INITDB_DATABASE") }],
+    roles: [{ role: 'read', db: _getEnv("MONGO_INITDB_DATABASE") }],
   },
 );
 

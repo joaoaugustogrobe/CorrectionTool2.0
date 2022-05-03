@@ -133,6 +133,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME:-root}"
       MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD:-example}"
       MONGO_INITDB_DATABASE: "${MONGO_INITDB_DATABASE:-correctiontool}"
+      MONGO_READONLY_PASSWORD: "${MONGO_READONLY_PASSWORD:-example}"
     volumes:
       - type: bind
         source: ./env/prod/mongo/mongo-init.js
