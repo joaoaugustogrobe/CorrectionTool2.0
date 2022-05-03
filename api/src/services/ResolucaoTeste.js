@@ -1,6 +1,7 @@
 const Exercicio = require('../models/Exercicio');
 const Teste = require('../models/Teste');
 const Resolucao = require('../models/Resolucao');
+const LogExecucao = require('../models/LogExecucao');
 const TesteResolucao = require('../models/TesteResolucao');
 const Difference = require('./Difference');
 
@@ -9,7 +10,7 @@ module.exports = {
   async armazenarOutput(payload) {
     console.log('==========')
     console.log('armazenarOutput para: ', payload.versao);
-    const { input, materia, exercicio, aluno, resolucao, teste, output, versao } = payload;
+    const { input, materia, exercicio, aluno, resolucao, teste, output, versao, meta } = payload;
     // const _output = parseOutput(payload.output);
 
     try {
@@ -49,6 +50,8 @@ module.exports = {
       }
 
       console.log(`[INFO] - Correção registrada. ${resolucoesExercicio.length}/${testesExercicio.length}`);
+
+      LogExecucao.create({...meta, testeResolucao: res._id});
 
     } catch (e) {
       console.error(e);
