@@ -25,7 +25,7 @@ const logExecucao = new mongoose.Schema({
         type: Object,
         required: false
     },
-    exercio: {
+    exercicio: {
         type: Object,
         required: false,
     }
