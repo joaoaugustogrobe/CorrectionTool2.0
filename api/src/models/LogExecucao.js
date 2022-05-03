@@ -21,6 +21,14 @@ const logExecucao = new mongoose.Schema({
         type: String,
         required: true,
     },
+    resolucao: {
+        type: Object,
+        required: false
+    },
+    exercio: {
+        type: Object,
+        required: false,
+    }
 });
 
 
