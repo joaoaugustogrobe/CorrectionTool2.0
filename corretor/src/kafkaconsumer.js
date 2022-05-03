@@ -45,7 +45,9 @@ class MQConsumer {
             const payload = JSON.parse(message.content.toString());
             console.log("[EVENT] - Comecando execução de exercício ");
 
-            const correcao = await this.dockerClient.executarTeste(payload);
+            const correcao = await this.dockerClient.executarTeste(payload).catch(e => {
+                this.channel.nack(message);
+            });
             const _correcao_inicio = correcao._correcao_inicio;
             const _correcao_final = correcao._correcao_final;
             

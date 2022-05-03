@@ -2,6 +2,7 @@ const { body } = require('express-validator');
 
 const Exercicio = require('../models/Exercicio');
 const Teste = require('../models/Teste');
+const Materia = require('../models/Materia');
 const Aluno = require('../models/Aluno');
 const TesteResolucao = require('../models/TesteResolucao');
 
@@ -48,6 +49,17 @@ schemas['POST/exercicio/salvar'] = {
 }
 
 schemas['POST/exercicio/create'] = {
+	materiaId: {
+		custom: {
+			options: async (value, { req, location, path }) => {
+				return Materia.findById(value).then(materia => {
+					if (!materia) {
+						return Promise.reject('Materia não existe');
+					}
+				});
+			},
+		},
+	},
 	titulo: {
 		isLength: {
 			errorMessage: 'Título deve conter ao menos 6 caracteres',

@@ -250,7 +250,6 @@ class Corretor {
         // vueStore.commit('loading/set', { endpoint: endpoint, status: true }, { root: true });
 
         // request to external api
-        console.log('getPlain', `${this.fullUrl}/${endpoint}`, this.config);
         const response = await axios.get(`${this.fullUrl}/${endpoint}`, { params: data, ...options }, this.config);
 
         return {

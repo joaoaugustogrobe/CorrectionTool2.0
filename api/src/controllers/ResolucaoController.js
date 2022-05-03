@@ -253,6 +253,7 @@ async function prepararCorrecao(resolucao) {
         nomeFuncao: teste.exercicio.nomeFuncao,
         versao: resolucao.tentativas,
         ext: '.m',
+        horarioAgendamento: Date.now(),
       }));
     })
 
