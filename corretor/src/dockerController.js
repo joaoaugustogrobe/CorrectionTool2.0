@@ -57,11 +57,12 @@ class DockerClient {
 					resolve({ 
 						output: output.replace(expr, ''),
 						meta: {
-							inicioExecucao: _correcao_final, 
-							finalExecucao: _correcao_inicio, 
+							inicioExecucao: _correcao_inicio, 
+							finalExecucao: _correcao_final, 
 							horarioAgendamento,
 							duracaoExecucao: _correcao_final - _correcao_inicio, 
 							tempoEmEspera:	_correcao_inicio - horarioAgendamento,
+							corretorId: process.env.HOSTNAME
 						}
 					});
 				})

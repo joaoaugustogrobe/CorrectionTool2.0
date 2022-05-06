@@ -35,7 +35,7 @@ async function run() {
             console.error("[ERRO] Não foi possivel inicializar o corretor - RabbitMQ offline - subscriber");
             throw e;
         });
-        console.log("[OK] RabbitMQ conectado");
+        console.log(`[OK] RabbitMQ conectado com ID ${process.env.HOSTNAME}`);
 
         await MQConsumer.run();
     } catch (e) {

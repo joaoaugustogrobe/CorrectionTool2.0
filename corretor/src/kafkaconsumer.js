@@ -58,7 +58,6 @@ class MQConsumer {
             await MQProducer.publishToMQ(JSON.stringify({
                 ...payload,
                 ...correcao,
-                corretorId: process.env.hostname || '1',
             }));
 
             this.channel.ack(message);
