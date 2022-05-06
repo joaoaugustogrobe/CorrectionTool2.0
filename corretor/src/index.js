@@ -9,7 +9,7 @@ const client = new Corretor();
 run();
 
 async function run() {
-    console.log("[INFO] - Conectando-se ao Kafka");
+    console.log("[INFO] - Conectando-se ao RabbitMQ");
     try {
 
         if(!process.env.TEMP_FOLDER_FULL_PATH){
@@ -27,15 +27,15 @@ async function run() {
         }
 
         await MQProducer.initializeConnection().catch(e => {
-            console.error("[ERRO] Não foi possivel inicializar o corretor - Kafka offline");
+            console.error("[ERRO] Não foi possivel inicializar o corretor - RabbitMQ offline");
             throw e;
         });
 
         await MQConsumer.initializeConnection(client).catch(e => {
-            console.error("[ERRO] Não foi possivel inicializar o corretor - Kafka offline - subscriber");
+            console.error("[ERRO] Não foi possivel inicializar o corretor - RabbitMQ offline - subscriber");
             throw e;
         });
-        console.log("[OK] Kafka conectado");
+        console.log("[OK] RabbitMQ conectado");
 
         await MQConsumer.run();
     } catch (e) {

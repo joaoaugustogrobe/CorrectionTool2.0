@@ -46,6 +46,8 @@ class MQConsumer {
             console.log("[EVENT] - Comecando execução de exercício ");
 
             const correcao = await this.dockerClient.executarTeste(payload).catch(e => {
+                console.log('[EVENT] - Erro ao executar teste: ');
+                console.error(e);
                 this.channel.nack(message);
             });
             const _correcao_inicio = correcao._correcao_inicio;
@@ -55,7 +57,8 @@ class MQConsumer {
 
             await MQProducer.publishToMQ(JSON.stringify({
                 ...payload,
-                ...correcao
+                ...correcao,
+                corretorId: process.env.hostname || '1',
             }));
 
             this.channel.ack(message);

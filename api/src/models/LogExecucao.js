@@ -14,11 +14,11 @@ const logExecucao = new mongoose.Schema({
         required: true,
     },
     duracaoExecucao: {
-        type: String,
+        type: Number,
         required: true,
     },
     tempoEmEspera: {
-        type: String,
+        type: Number,
         required: true,
     },
     resolucao: {
@@ -28,7 +28,11 @@ const logExecucao = new mongoose.Schema({
     exercicio: {
         type: Object,
         required: false,
-    }
+    },
+    corretorId: {
+        type: String,
+        default: '',
+    },
 });
 
 

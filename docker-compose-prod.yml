@@ -96,7 +96,7 @@ services:
 
 
   p_corretor:
-    container_name: 'p_corretor'
+    # container_name: 'p_corretor' // conteiner_name conflicts when scaling
     build:
       context: "./env/prod/corretor"
     depends_on:
