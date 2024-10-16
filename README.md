@@ -1,70 +1,169 @@
-# CorrectionTool2.0
-Uma forma de realizar correções de algorítmos de forma automatica e em tempo real, garantindo feedback instantâneo para o aluno.
-Trabalho realizado como projeto de Iniciação Tecnológica pela UTFPR, campus de Ponta Grossa. 
+# Octave Correction Tool
 
-*Modulo de correção ainda esta em desenvolvimento.* Este modulo esta com problemas na geração da nota, porém o codigo do ajulo ja é executado e comparado com o output de cada teste. Após a submissão do codigo feita pelo aluno, um websocket é aberto entre o aluno e o servidor para acompanhar o progresso da correção.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![GitHub Issues](https://img.shields.io/github/issues/joaoaugustogrobe/CorrectionTool2.0.svg)
 
-## Professor
-O professor deve cadastrar exercícios para uma de suas matérias (préviamente cadastradas), esse exercício deve ter um ou mais teste,
-que serão utilizados durante a correção do exercício após cada submissão feita pelo aluno.
-Cada teste consiste em uma entrada para o algorítmo do aluno e uma saida ideal para aquela entrada.
+## Table of Contents
 
-![GitHub Logo](https://media.giphy.com/media/efxitnd1jNkiGxTEtZ/giphy.gif)
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-## Aluno
-O aluno tem acesso a um dashboard que exibe todas as matérias em que ele esta matriculado, e a seus respectivos exercícios e prazos
-de entrega.
-Ao realizar a submissão de um exercício, o servidor ira executar o código dentro de um container, previnindo a execução de códigos
-malíciosos, utilizando os dados de cada um dos testes préviamente cadastrados pelo professor. Após a execução, o servidor retorna
-a nota do aluno.
+## Overview
 
-![GitHub Logo](https://media.giphy.com/media/SwyJsYmgyxdNEm1iyN/giphy.gif)
+**Octave Correction Tool** was developed as part of my final bachelor’s thesis.
+
+For more information, check the my thesis in [portuguese](https://drive.google.com/file/d/1Vr_3f_ZE9s7d8NMzGPQDJvieRiAMbspm/view?usp=drive_link) or [english](https://drive.google.com/file/d/1cTfLssH6WCpqBk-HyzWc_J3tumObsP7Y/view?usp=drive_link)
+
+> Note: The english version was translated using an online tool, I recommend checking the original document - in portuguese - if possible.
+
+It is a platform designed to assist professors in the subject of Numeric Calculus by automating the evaluation of student assignments, currently only supporting Octave assigments. Hosted within a monorepo structure, the repository comprises several interconnected services that streamline the submission, execution, and grading of numerical methods implemented by students in Octave.
+
+Traditional methods of manual code evaluation are time-consuming and error-prone, especially in large classes where hundreds or thousands of executions may be required. This platform addresses these challenges by offering automated batch processing of student-submitted algorithms, providing rapid feedback and reducing the grading workload for educators.
+
+## Features
+
+- **Automatic Execution of Algorithms:** Automatically execute student submissions as they're uploaded, ensuring consistency and efficiency.
+- **Scalable Architecture:** Capable of handling large volumes of submissions by executing exercises in parallel.
+- **User Management:** Manage classes, exercises, and test cases with ease.
+- **Automated Feedback:** Provide students with immediate feedback based on predefined test cases.
+- **Secure Execution Environment:** Isolated containers ensure safe execution of untrusted student code.
+- **Intuitive Interface:** User-friendly front-end for both professors and students to interact with the platform.
+
+## Architecture
+
+![Architecture Diagram](docs/architecture-diagram.png)
+
+The system is built as a monorepo containing several microservices, each responsible for distinct functionalities:
+
+1. **Database:** Utilizes MongoDB for storing user data, assignments, test cases, and execution results.
+2. **Message Broker:** RabbitMQ handles asynchronous communication between services, ensuring reliable task processing.
+3. **Execution Engine:** Manages the execution of student-submitted Octave code within isolated Docker containers.
+4. **Octave** Octave container where the student's code will be run. A clear container with octave-cli, and a binded volume with student data.
+5. **API** A Express API which handles most of the logic in the system. Exposes endpoints for the professor and student.
+6. **Frontend:** A web-based interface developed using Vue.js, allowing users to interact with the platform seamlessly.
+7. **NGINX:** Serves as the central communication hub, handling requests from the client and coordinating between the API and the Front End.
+
+## Technologies Used
+
+- **Frontend:** Vue.js, Vuetify
+- **Backend:** Node.js, Express
+- **Database:** MongoDB
+- **Containerization:** Docker, Docker Compose
+- **Messaging:** RabbitMQ
+- **Execution Environment:** GNU Octave
+- **Web Server:** NGINX
+- **Authentication:** JSON Web Tokens (JWT)
+
+## Installation
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/get-started) installed on your machine
+- [Docker Compose](https://docs.docker.com/compose/install/) installed
+
+### Steps
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/joaoaugustogrobe/CorrectionTool2.0.git
+   cd CorrectionTool2.0
+   ```
+
+2. **Configure Environment Variables**
+
+   Create a `.env` file in the root directory and populate it based on the `.env.example` provided.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit the `.env` file to set your configuration parameters, such as database credentials, API keys, and other necessary settings.
+
+3. **Build and Deploy Services**
+
+   Use Docker Compose to build and start all services.
+
+   ```bash
+   docker-compose up -f docker-compose-prod.yml --build
+   ```
+
+   This command will set up the frontend, backend API, database, message broker, and execution engine.
+
+4. **Access the Application**
+
+   Once all services are up and running, navigate to `http://localhost:3000` in your web browser to access the platform.
+
+## Usage
+
+### For Professors
+
+1. **Login/Sign Up:** Access the platform using your credentials.
+2. **Manage Classes:** Create and manage classes, enroll students, and assign courses.
+3. **Create Exercises:** Define new exercises by specifying the problem statement, function signatures, and associated test cases.
+4. **Define Test Cases:** Set up both public and private test cases with specific input parameters and expected outputs.
+5. **Review Submissions:** Monitor student submissions, review execution results, and provide feedback or override automatic grades as necessary.
+
+![Professor Portal](https://media.giphy.com/media/efxitnd1jNkiGxTEtZ/giphy.gif)
 
 
-## Backend
-### API
-Para o desenvolvimento da plataforma é utilizado uma API REST,  que expõe um conjunto de rotas para o cadastro e a obtenção de informações do banco de dados, tratando as requisições devidamente para validar os dados e controlar o acesso impedindo, por exemplo, que um aluno tenha acesso a informações de outros alunos. Também são encontrados rotas para a submissão de arquivos (resoluções enviadas pelos alunos), que são salvos em um subdiretório do servidor. 
+### For Students
 
-Esse servidor é desenvolvido em JavaScript e Node.js, utilizando o framework Express, que fornece um conjunto robusto de ferramentas para o desenvolvimento de APIs e servidores.
+1. **Login/Sign Up:** Access the platform using your credentials.
+2. **Enroll in Classes:** Join available classes or be enrolled by your professor.
+3. **Download Templates:** Access exercise templates provided by your professor to ensure proper submission format.
+4. **Submit Assignments:** Upload your Octave scripts for evaluation.
+5. **Receive Feedback:** View automated test results and feedback to improve your solutions.
 
-Uma rotina importante do servidor é gerenciar uma fila de correções. A correção não pode ser efetuada enquanto a requisição de submissão do aluno é feita, pois essa rotina pode levar certo tempo, possibilitando a conexão expirar e o usuário ficar sem feedback. Por conta disso, quando uma nova submissão é enviada pelo aluno, uma instrução de correção é inserida em uma fila de execuções, passada para o Corretor, e um socket é aberto para a comunicação entre o servidor e cliente.
-
-A comunicação da API REST usada na plataforma se baseia em protocolos HTTP, desta forma, a comunicação é sempre inicializada pelo lado do cliente. Por conta disso, o servidor também expõe um servidor websocket, que se trata de uma comunicação TCP, onde dados podem ser transmitidos a qualquer momento pelo servidor ou pelo cliente.
-
-Durante a etapa de autenticação o servidor gera um token, identificando o usuário e sua  função (aluno ou professor). Esse token é um Json Web Token, que é uma forma do servidor realizar uma assinatura digital que pode ser visualizada pelo usuário, mas não pode ser alterada. Esse token deve ser usado pelo frontend para efetuar as futuras requisições que requerem autenticação. 
+![Student Portal](https://media.giphy.com/media/SwyJsYmgyxdNEm1iyN/giphy.gif)
 
 
-### Corretor
+## Contributing
 
-Por conta da sensibilidade de executar um código desconhecido, submetido por um aluno, esse código não deve ser executado no mesmo container do servidor por questões de segurança. Por isso, um container é preparado contendo apenas os programas e arquivos necessários para a execução e comparação. Dessa forma, o código sempre é executado em um ambiente seguro e isolado, garantindo que a execução da resolução não terá acesso a submissões de outros alunos ou da máquina hospedeira.
+Contributions are welcome! Please follow these steps to contribute:
 
-Além do isolamento, rodar o código do aluno em um ambiente diferente do servidor permite usufruir de outras linguagens, pois não ficamos presos a linguagem JavaScript. Linguagens essas que podem ser mais performáticas ou abstraídas para fazer comparações entre a saída do exercício corrigido e a saída do teste, informada pelo professor. Desse modo, esse container pode ser configurado para rodar em uma máquina diferente do servidor, podendo ter especificações para a otimização do processamento ou I/O. Independente de onde esse container rode, ele irá executar em uma thread independente do servidor, não bloqueando a chegada de novas requisições.
+1. **Fork the Repository**
 
-Considerando que o sistema de correção automáticas poderá ser usado para corrigir rotinas de diferentes linguagens de programação, cada linguagem de programação deve ter seu próprio motor corretor e o programa corretor responsável por executar o código fonte e realizar o escore da atividade de acordo com a saída gerada pelo código e a saída esperada pelo teste. O motor deve estar configurado com os softwares para efetuar a compilação (se necessário) e a execução do código do aluno.
+   Click the [Fork](https://github.com/joaoaugustogrobe/CorrectionTool2.0.git) button on the repository page.
 
-Ao iniciar esse container, parâmetros de configurações para o programa corretor devem ser informados. Nesses parâmetros são definidos qual a operação se quer fazer: 
+2. **Create a Feature Branch**
 
-* Executar: solicita a execução de um código com determinados parâmetros de entrada.
-O programa faz uma chamada por linha de comando para a execução do código, gravando o output no diretório especificado.
-Os parâmetros adicionais para a operação são:
--diretório do código;
--diretório de um arquivo descrevendo os parâmetros de entrada;
--diretório onde serão salvos as saídas.
+   ```bash
+   git checkout -b feature/YourFeatureName
+   ```
 
-* Comparar: solicita a comparação do arquivo de saída do aluno com a saída do teste, informada pelo professor. Um programa de escore de atividades, que trataremos como uma caixa preta nesse relatório, é responsável por atribuir uma nota de 0 até 10 de acordo com a semelhança entre os dois arquivos passados. A nota é passada ao servidor ao término da comparação através da API REST.
-Os parâmetros adicionais para a operação são:
+3. **Commit Your Changes**
 
--Diretório do arquivo de saídas do aluno.
--Diretório do arquivo de saídas do teste.
+   ```bash
+   git commit -m "Add some feature"
+   ```
 
-Ao final de qualquer operação o programa faz uma chamada a API REST informando que a operação foi efetuada com sucesso/falha e enviando os dados referentes a operação. Com isso o servidor sabe o estado da correção e consegue dar um feedback para o aluno.
+4. **Push to the Branch**
 
+   ```bash
+   git push origin feature/YourFeatureName
+   ```
 
-## Frontend
-O fronted foi desenvolvido utilizando o framework Vuejs, uma ferramenta popular para o desenvolvimento de interfaces, componentes e páginas web responsivas, ou seja, que se adaptam em qualquer tipo de dispositivo, e com uso da biblioteca Vuetify é possível utilizar os componentes, botões e ícones do Material Design, padrão adotado por grandes empresas e desenvolvido pela Google. 
+5. **Open a Pull Request**
 
-Esse container expõe uma SPA (Single Page Application) na porta 80, porta padrão para sites. Essa página tem scripts para carregar o conteúdo dinamicamente através das requisições da API, preenchendo a página com informações do aluno/professor, exercícios e entre outros dados.
+   Navigate to the original repository and click on "Compare & pull request."
 
-Através do token de autorização, comentado na seção anterior, o frontend tem como renderizar conteúdo específico para o cargo do usuário, e se essa informação for alterada, o servidor consegue bloquear as requisições devido ao token inválido. 
+Please ensure your contributions adhere to the project's code of conduct and include relevant tests and documentation where applicable.
 
-O conteúdo gerado para o professor tem sessões para a administração de matérias e exercícios. Dentro da administração de exercícios é possível configurar testes públicos e privados. Os testes públicos tem os parâmetros de entrada e saída visíveis para o aluno, permitindo que ele faça testes locais com os mesmos valores. Já os testes privados são fechados para o aluno, pois ele não tem acesso aos parâmetros de entrada e de saída. Após a submissão do exercício, execução e avaliação pelo servidor, o aluno tem o feedback de todos os testes.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any inquiries or support, please contact:
+
+- **Email:** contato@joaocastilho.com.br
+- **LinkedIn:** [João Castilho](https://www.linkedin.com/in/joao-augusto-grobe-castilho/)
